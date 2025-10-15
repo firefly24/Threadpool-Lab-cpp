@@ -12,7 +12,6 @@ using namespace std;
 static std::mutex cout_mtx;
 typedef std::function<void()> T;
 
-//template <typename T>
 class ThreadPool_Q {
 private:
     std::size_t capacity;
@@ -72,7 +71,7 @@ public:
         completed_tasks = 0;
         stop_pool = false;
         // Initialize worker threads
-        for(int i=0;i<maxWorkers;i++)
+        for(size_t i=0;i<maxWorkers;i++)
             worker_threads.emplace_back([this]{startWorkerThread();}); // lamba fn to pop a task from queue to execute
     }
 
@@ -122,6 +121,17 @@ public:
         return result;
     }
 
+    //Fire and forget tasks
+    bool tryPush(T&& task)
+    {
+        std::unique_lock<std::mutex> mLock(mtx);
+        if (stop_pool || (taskList.size() >= capacity))
+            return false;
+        taskList.push(std::forward<T>(task));
+        cond_.notify_one();
+        return true;
+    }
+
     void stopPool(){
         std::unique_lock<std::mutex> mLock(mtx);
         stop_pool = true;
@@ -132,6 +142,7 @@ public:
     ~ThreadPool_Q()
     {
         // Stop the pool and notify all worker threads
+        std::cout << "ThreadPool stopped" << std::endl;
         stopPool(); 
         // Join all worker threads
         for (auto& worker : worker_threads)
