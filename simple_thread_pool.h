@@ -1,3 +1,5 @@
+#ifndef SIMPLE_THREADPOOL_H
+#define SIMPLE_THREADPOOL_H
 #include <thread>
 #include <queue>
 #include <mutex>
@@ -158,3 +160,5 @@ public:
             worker.join();
     }
 };
+
+#endif /* SIMPLE_THREADPOOL_H */
