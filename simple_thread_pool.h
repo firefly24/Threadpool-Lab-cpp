@@ -8,8 +8,10 @@
 #include <iostream>
 #include <vector>
 #include <future>
+#include "../simple_actor_model_cpp/actor_model_logger_tracer.h"
 
 using namespace std;
+using pprof = ActorModel::Profile::Profiler ;
 
 static std::mutex cout_mtx;
 typedef std::function<void()> T;
@@ -53,6 +55,7 @@ private:
             // Pop a task from the queue to attach to current worker thread
             task = std::move(taskList.front());
             taskList.pop();
+            pprof::instance().record(ActorModel::Profile::EventType::PoolDequeue,0,0, 1234);
             mLock.unlock();
             // Execute the task
             try
@@ -112,7 +115,7 @@ public:
 
         std::unique_lock<std::mutex> mLock(mtx);
         // Wait until there is space in the queue
-        if (!cond_.wait_for(mLock, std::chrono::seconds(20), [this]()
+        if (!cond_.wait_for(mLock, std::chrono::milliseconds(20), [this]()
                             { return (taskList.size() < capacity) || stop_pool.load(std::memory_order_acquire); }))
             throw std::runtime_error("Timeout! Queue is full.");
 
@@ -134,6 +137,7 @@ public:
         if (stop_pool.load(std::memory_order_acquire) || (taskList.size() >= capacity))
             return false;
         taskList.push(std::forward<T>(task));
+        pprof::instance().record(ActorModel::Profile::EventType::PoolEnqueue,0,0, 1234);
         cond_.notify_one();
         return true;
     }
