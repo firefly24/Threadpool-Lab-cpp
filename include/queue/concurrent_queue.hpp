@@ -26,12 +26,12 @@ public:
 	ConcurrentQueue& operator=(ConcurrentQueue&&) = delete;
 	
 	// for when task is an lvalue
-	bool try_push(const T& item);
+	bool tryPush(const T& item);
 	
 	// if task is an rvalue
-	bool try_push(T&& item);
+	bool tryPush(T&& item);
 	
-	bool try_pop(T& item);
+	bool tryPop(T& item);
 	
 	bool empty() const ;
 	
@@ -47,7 +47,7 @@ ConcurrentQueue<T>::ConcurrentQueue(std::size_t capacity): capacity_(capacity) {
 
 
 template<typename T>
-bool ConcurrentQueue<T>::try_push(const T& item)
+bool ConcurrentQueue<T>::tryPush(const T& item)
 {
 	std::lock_guard<std::mutex> lock(mtx_);
 	
@@ -60,7 +60,7 @@ bool ConcurrentQueue<T>::try_push(const T& item)
 }
 
 template<typename T>
-bool ConcurrentQueue<T>::try_push(T&& item)
+bool ConcurrentQueue<T>::tryPush(T&& item)
 {
 	std::lock_guard<std::mutex> lock(mtx_);
 	
@@ -74,7 +74,7 @@ bool ConcurrentQueue<T>::try_push(T&& item)
 
 
 template<typename T>
-bool ConcurrentQueue<T>::try_pop(T& item)
+bool ConcurrentQueue<T>::tryPop(T& item)
 {
 	std::lock_guard<std::mutex> lock(mtx_);
 	

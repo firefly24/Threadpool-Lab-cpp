@@ -3,13 +3,13 @@
 #include <thread>
 #include <condition_variable>
 #include <functional>
-//#include <queue>
-//#include <mutex>
 #include <iostream>
 #include <vector>
 #include <future>
+#include <semaphore>
+#include <cassert>
 
-#include "../queue/concurrent_queue.hpp"
+#include "queue/concurrent_queue.hpp"
 
 using namespace std;
 
@@ -20,10 +20,9 @@ class ThreadPool_Q
 private:
     std::size_t capacity;
     std::size_t maxWorkers;
-    //std::queue<T> taskList;
+    
     ConcurrentQueue<T> taskList;
-    std::mutex mtx;
-    std::condition_variable cond_;
+    std::counting_semaphore<10> work_items;
     std::vector<std::thread> worker_threads;
     std::atomic<unsigned int> completed_tasks;
     std::atomic<bool> stop_pool;
@@ -43,21 +42,24 @@ private:
         // keep polling for new tasks on this thread
         while (1)
         {
-            unique_lock<mutex> mLock(mtx);
             // Wait until there is a task in the queue
-            cond_.wait(mLock, [this]()
-                       { return !taskList.empty() || stop_pool.load(std::memory_order_acquire); });
+			work_items.acquire();
 
-            // return only if pool is stopped and all tasks are completed
-            if (stop_pool.load(std::memory_order_acquire) && taskList.empty())
-                return;
-
+			// return only if pool is stopped and all tasks are completed
+			if (stop_pool.load(std::memory_order_acquire))
+			{
+				if(taskList.empty())
+					return;		
+			}
+				
             // Pop a task from the queue to attach to current worker thread
-            //task = std::move(taskList.front());
-            //taskList.pop();
-            taskList.try_pop(task);
-            
-            mLock.unlock();
+            if ( !taskList.tryPop(task) )
+            {
+            	// this should almost never fail now, will add error log/event log later
+            	assert(false);
+            	continue;
+            }
+
             // Execute the task
             try
             {
@@ -70,24 +72,58 @@ private:
             // Notify that a task has been completed
             completed_tasks++;
         }
+        
+        
     }
 
 public:
     // Constructor launch worker threads
-    explicit ThreadPool_Q(std::size_t task_capacity, std::size_t max_workers) : capacity(task_capacity), maxWorkers(max_workers), taskList(task_capacity)
+    explicit ThreadPool_Q(std::size_t task_capacity, std::size_t max_workers) : capacity(task_capacity), maxWorkers(max_workers), taskList(task_capacity), work_items(0)
     {
         completed_tasks = 0;
         stop_pool.store(false, std::memory_order_release);
         // Initialize worker threads
         for (size_t i = 0; i < maxWorkers; i++)
-            worker_threads.emplace_back([this]
-                                        { startWorkerThread(); }); // lamba fn to pop a task from queue to execute
+            worker_threads.emplace_back([this](){ startWorkerThread(); }); 
+                                         // lamba fn to pop a task from queue to execute
     }
 
     int completedTaskCount()
     {
         return completed_tasks.load();
     }
+    
+    // lvalue overload- for Fire and forget tasks with no return value
+    bool taskSubmit(T& task)
+    {
+        if ( stop_pool.load(std::memory_order_acquire) )
+            return false;
+        
+        if (taskList.tryPush(task) )
+        {
+        	work_items.release();
+        	return true;
+        }
+        	
+        return false;
+    }
+    
+    // rvalue overload- for Fire and forget tasks with no return value
+    bool taskSubmit(T&& task)
+    {
+    	if ( stop_pool.load(std::memory_order_acquire) )
+            return false;
+        
+        if (taskList.tryPush(std::move(task)) ) 
+        {
+        	work_items.release();
+        	return true;
+        }
+        
+    	return false;
+    }
+    
+    /*
 
     // Push a task into the queue, and return a future object which other programs can use to fetch results of the task
     // need to declare the return type as std::future explicitly, as auto is deducing it as "void"
@@ -130,39 +166,38 @@ public:
         cond_.notify_one();
         return result;
     }
+    
+    */
 
-    // Fire and forget tasks
-    bool tryPush(T &&task)
-    {
-        std::unique_lock<std::mutex> mLock(mtx);
-        if (stop_pool.load(std::memory_order_acquire) || (taskList.size() >= capacity))
-            return false;
-        taskList.try_push(std::forward<T>(task));
-        
-        cond_.notify_one();
-        return true;
-    }
-
+    
+	// stopPool will only be used for graceful shutdown
+	// TODO: I'll add another function for emergency terminate later
     void stopPool()
     {
-        std::unique_lock<std::mutex> mLock(mtx);
+    	// notify threadpool to stop accepting new work
         stop_pool.store(true, std::memory_order_release);
-        mLock.unlock();
-        cond_.notify_all(); // Notify all worker threads to wake up and check the stop condition
-
-        // Join all worker threads
+		
+		// Notify all worker threads to wake up and return now as queue is empty
+		// TODO: refine later if this belongs here or in destructor
+		for (std::size_t worker=0; worker<maxWorkers; worker++)
+			work_items.release();
+		
     }
 
     ~ThreadPool_Q()
-    {
+    {	
         // Stop the pool and notify all worker threads
-        std::cout << "ThreadPool stopped" << std::endl;
-
-        if (stop_pool.exchange(false))
+        if (!stop_pool.exchange(true))
             stopPool();
         
+        // Join all worker threads
         for (auto &worker : worker_threads)
-            worker.join();
+        {
+        	if (worker.joinable())
+            	worker.join();
+        }
+
+		std::cout << "ThreadPool stopped" << std::endl;
     }
 };
 

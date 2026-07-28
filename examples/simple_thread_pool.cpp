@@ -37,10 +37,14 @@ void test_fire_and_forget_tasks()
     for (int i=0;i<n;i++)
     {   
         std::function<void()> task = constructTask<std::function<void()>>(worker,fruits[i]);
-        myThreadPool.tryPush(std::move(task));
+        //myThreadPool.tryPush(std::move(task));
+        myThreadPool.taskSubmit(std::move(task));
     }
+    
+    std::cout << "End of function" << std::endl;
 }
 
+/*
 void test_task_with_string_returns()
 {
     int n=10;
@@ -57,11 +61,12 @@ void test_task_with_string_returns()
         cout << results[i].get() <<endl;
     }
 }
+*/
 
 int main()
 {
     test_fire_and_forget_tasks();
-    std::this_thread::sleep_for(std::chrono::seconds(1));
+   // std::this_thread::sleep_for(std::chrono::seconds(1));
     cout << "----------------------------------------------------" << std::endl;
     //test_task_with_string_returns();
 
