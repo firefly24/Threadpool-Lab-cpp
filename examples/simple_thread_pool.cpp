@@ -1,9 +1,10 @@
 #include <iostream>
 #include <mutex>
 #include <thread>
-#include "thread_pool_with_return.h"
+#include "threadpool/thread_pool.hpp"
 
 using namespace std;
+static std::mutex cout_mtx;
 
 template <typename Task, typename Func, typename... Args>
 Task constructTask(Func&& func, Args&&... args)
@@ -62,7 +63,7 @@ int main()
     test_fire_and_forget_tasks();
     std::this_thread::sleep_for(std::chrono::seconds(1));
     cout << "----------------------------------------------------" << std::endl;
-    test_task_with_string_returns();
+    //test_task_with_string_returns();
 
     // No need to wait for a while to let the tasks complete, as threadPool destructor will take care of waiting till all threads are joined
 

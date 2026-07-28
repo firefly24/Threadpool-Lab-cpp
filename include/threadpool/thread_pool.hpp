@@ -1,19 +1,18 @@
 #ifndef SIMPLE_THREADPOOL_H
 #define SIMPLE_THREADPOOL_H
 #include <thread>
-#include <queue>
-#include <mutex>
 #include <condition_variable>
 #include <functional>
+//#include <queue>
+//#include <mutex>
 #include <iostream>
 #include <vector>
 #include <future>
-#include "../simple_actor_model_cpp/actor_model_logger_tracer.h"
+
+#include "../queue/concurrent_queue.hpp"
 
 using namespace std;
-using pprof = ActorModel::Profile::Profiler ;
 
-static std::mutex cout_mtx;
 typedef std::function<void()> T;
 
 class ThreadPool_Q
@@ -21,7 +20,8 @@ class ThreadPool_Q
 private:
     std::size_t capacity;
     std::size_t maxWorkers;
-    std::queue<T> taskList;
+    //std::queue<T> taskList;
+    ConcurrentQueue<T> taskList;
     std::mutex mtx;
     std::condition_variable cond_;
     std::vector<std::thread> worker_threads;
@@ -53,9 +53,10 @@ private:
                 return;
 
             // Pop a task from the queue to attach to current worker thread
-            task = std::move(taskList.front());
-            taskList.pop();
-            pprof::instance().record(ActorModel::Profile::EventType::PoolDequeue,0,0, 1234);
+            //task = std::move(taskList.front());
+            //taskList.pop();
+            taskList.try_pop(task);
+            
             mLock.unlock();
             // Execute the task
             try
@@ -73,7 +74,7 @@ private:
 
 public:
     // Constructor launch worker threads
-    explicit ThreadPool_Q(std::size_t task_capacity, std::size_t max_workers) : capacity(task_capacity), maxWorkers(max_workers)
+    explicit ThreadPool_Q(std::size_t task_capacity, std::size_t max_workers) : capacity(task_capacity), maxWorkers(max_workers), taskList(task_capacity)
     {
         completed_tasks = 0;
         stop_pool.store(false, std::memory_order_release);
@@ -123,8 +124,8 @@ public:
         // TODO: implement stop condition
         if (stop_pool.load(std::memory_order_acquire))
             throw std::runtime_error("Cannot enqueue new tasks as thread pool is stopped");
-        taskList.emplace([survivorPtr_pkTask]()
-                         { (*survivorPtr_pkTask)(); });
+        //taskList.emplace([survivorPtr_pkTask]()
+        //                 { (*survivorPtr_pkTask)(); });
         mLock.unlock();
         cond_.notify_one();
         return result;
@@ -136,8 +137,8 @@ public:
         std::unique_lock<std::mutex> mLock(mtx);
         if (stop_pool.load(std::memory_order_acquire) || (taskList.size() >= capacity))
             return false;
-        taskList.push(std::forward<T>(task));
-        pprof::instance().record(ActorModel::Profile::EventType::PoolEnqueue,0,0, 1234);
+        taskList.try_push(std::forward<T>(task));
+        
         cond_.notify_one();
         return true;
     }
