@@ -6,6 +6,8 @@
 using namespace std;
 static std::mutex cout_mtx;
 
+using Work = std::function<void()>;
+
 template <typename Task, typename Func, typename... Args>
 Task constructTask(Func&& func, Args&&... args)
 {
@@ -31,12 +33,13 @@ std::string worker_return_string(const std::string &s) {
 void test_fire_and_forget_tasks()
 {
     int n=10;
-    ThreadPool_Q myThreadPool(n, 4);
+    ThreadPool<Work> myThreadPool(n, 4);
 
     vector<string> fruits {"Apple", "Banana", "Pear", "Mango", "Guava", "Kiwi", "Orange", "Melon", "Papaya","Pineapple"};
     for (int i=0;i<n;i++)
     {   
-        std::function<void()> task = constructTask<std::function<void()>>(worker,fruits[i]);
+        //std::function<void()> task = constructTask<std::function<void()>>(worker,fruits[i]);
+        Work task = constructTask<Work>(worker,fruits[i]);
         //myThreadPool.tryPush(std::move(task));
         myThreadPool.taskSubmit(std::move(task));
     }
@@ -48,7 +51,7 @@ void test_fire_and_forget_tasks()
 void test_task_with_string_returns()
 {
     int n=10;
-    ThreadPool_Q myThreadPool(10, 4);
+    ThreadPool myThreadPool(10, 4);
 
     std::vector<std::future<std::string>> results;
     vector<string> fruits {"Apple", "Banana", "Pear", "Mango", "Guava", "Kiwi", "Orange", "Melon", "Papaya","Pineapple"};
