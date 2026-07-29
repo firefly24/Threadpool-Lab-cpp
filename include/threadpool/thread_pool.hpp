@@ -211,6 +211,12 @@ void ThreadPool<Task>::startWorkerThread() noexcept
         if ( !task_queue_.tryPop(task) )
         {
         	// this should almost never fail now, will add error log/event log later
+        	
+			std::cout << "tryPop failed. stop_pool = "
+				      << stop_requested_.load()
+				      << ", queue empty = "
+				      << task_queue_.empty()
+				      << '\n';
         	assert(false);
         	continue;
         }

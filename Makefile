@@ -4,13 +4,22 @@ CXXFLAGS := -Wall -std=c++20
 INCLUDES := -Iinclude
 
 TARGET := threadpool
-
 SRC := examples/simple_thread_pool.cpp
 
-all:
+TEST_TARGET := test_basic
+TEST_SRC := tests/test_basic.cpp
+
+.PHONY: all test clean
+
+all: $(TARGET)
+
+$(TARGET):
 	$(CXX) $(CXXFLAGS) $(INCLUDES) $(SRC) -o $(TARGET)
 #	g++ -Wall -std=c++20 simple_thread_pool.cpp -o myThreadPool.exe
 
+# build tests
+test:
+	$(CXX) $(CXXFLAGS) $(INCLUDES) $(TEST_SRC) -o $(TEST_TARGET)
 
 # Plain debug build
 
@@ -18,6 +27,8 @@ all:
 # Release build - for performance testing
 
 
+
+
 # clean artifacts
 clean:
-	rm -f $(TARGET)
+	rm -f $(TARGET) $(TEST_TARGET)
