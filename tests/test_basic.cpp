@@ -17,6 +17,7 @@ void testBasicExecution(int queue_size, int num_workers, int numtasks)
 	assert(queue_size > 0 );
 	std::atomic<int> submitted{0};
 	std::atomic<int> tasks_executed{0};
+	//int tasks_executed =0;
 	
 	// force threadpool lifetime complete before assert, otherwise assert might be fired before all thread complete and join
 	{

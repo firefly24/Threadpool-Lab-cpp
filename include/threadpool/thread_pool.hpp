@@ -210,13 +210,19 @@ void ThreadPool<Task>::startWorkerThread() noexcept
         // Pop a task from the queue to attach to current worker thread
         if ( !task_queue_.tryPop(task) )
         {
-        	// this should almost never fail now, will add error log/event log later
+        	// pop failure due to queue empty is only ok during pool termination
+        	if (stop_requested_.load(std::memory_order_relaxed))
+        		return;
         	
+        	/*
 			std::cout << "tryPop failed. stop_pool = "
 				      << stop_requested_.load()
 				      << ", queue empty = "
 				      << task_queue_.empty()
 				      << '\n';
+			*/
+			
+			// this should almost never fail now, will add error log/event log later
         	assert(false);
         	continue;
         }
