@@ -23,7 +23,7 @@ private:
     std::size_t maxWorkers;
     
     ConcurrentQueue<Task> task_queue_;
-    std::counting_semaphore<10> work_items;
+    std::counting_semaphore<INT_MAX> work_items;
     std::vector<std::thread> worker_threads;
     std::atomic<unsigned int> completed_tasks;
     std::atomic<bool> stop_requested_;
@@ -38,6 +38,10 @@ private:
 
     // Worker thread function to pop tasks from the queue and execute them
     void startWorkerThread() noexcept;
+    
+    // for debug counters
+    std::atomic<unsigned int> submitted;
+    std::atomic<unsigned int> consumed;
 
 public:
 
@@ -113,7 +117,9 @@ template<typename Task>
 ThreadPool<Task>::ThreadPool(std::size_t task_capacity, std::size_t max_workers) :
 					maxWorkers(max_workers), 
 					task_queue_(task_capacity), 
-					work_items(0)
+					work_items(0),
+					submitted(0),
+					consumed(0)
 {
     completed_tasks = 0;
     stop_requested_.store(false, std::memory_order_release);
@@ -134,6 +140,7 @@ bool ThreadPool<Task>::taskSubmit(Task& task)
     if (task_queue_.tryPush(task) )
     {
     	work_items.release();
+    	submitted++;
     	return true;
     }
     	
@@ -150,6 +157,7 @@ bool ThreadPool<Task>::taskSubmit(Task&& task)
     if (task_queue_.tryPush(std::move(task)) ) 
     {
     	work_items.release();
+    	submitted++;
     	return true;
     }
     
@@ -165,8 +173,18 @@ void ThreadPool<Task>::stopPool()
 	
 	// Notify all worker threads to wake up and return now as queue is empty
 	// TODO: refine later if this belongs here or in destructor
-	for (std::size_t worker=0; worker<maxWorkers; worker++)
+	for (std::size_t worker=0; worker<=maxWorkers; worker++)
+	{
 		work_items.release();
+		submitted++;
+	}
+		
+	// Join all worker threads
+    for (auto &worker : worker_threads)
+    {
+    	if (worker.joinable())
+        	worker.join();
+    }
 	
 }
 
@@ -178,14 +196,7 @@ ThreadPool<Task>::~ThreadPool()
     if (!stop_requested_.exchange(true))
         stopPool();
     
-    // Join all worker threads
-    for (auto &worker : worker_threads)
-    {
-    	if (worker.joinable())
-        	worker.join();
-    }
-
-	std::cout << "ThreadPool stopped" << std::endl;
+	//std::cout << "ThreadPool stopped" << std::endl;
 }
 
 
@@ -194,37 +205,41 @@ template<typename Task>
 void ThreadPool<Task>::startWorkerThread() noexcept
 {
     Task task;
+    
+    std::cout << "Starting thread: " << std::hex << std::this_thread::get_id() << std::endl;
+    
     // keep polling for new tasks on this thread
     while (1)
     {
         // Wait until there is a task in the queue
 		work_items.acquire();
+		consumed++;
 
 		// return only if pool is stopped and all tasks are completed
 		if (stop_requested_.load(std::memory_order_acquire))
 		{
 			if(task_queue_.empty())
-				return;		
+				goto stop_worker;		
 		}
 			
         // Pop a task from the queue to attach to current worker thread
         if ( !task_queue_.tryPop(task) )
         {
-        	// pop failure due to queue empty is only ok during pool termination
-        	if (stop_requested_.load(std::memory_order_relaxed))
-        		return;
-        	
         	/*
-			std::cout << "tryPop failed. stop_pool = "
+       		 std::cout << "tryPop failed. stop_pool = "
 				      << stop_requested_.load()
 				      << ", queue empty = "
 				      << task_queue_.empty()
-				      << '\n';
+				      << " thread = " << std::this_thread::get_id() << std::endl;
 			*/
+			
+        	// pop failure due to queue empty is only ok during pool termination
+        	if (stop_requested_.load(std::memory_order_acquire))
+        		goto stop_worker;
 			
 			// this should almost never fail now, will add error log/event log later
         	assert(false);
-        	continue;
+        	goto stop_worker;
         }
 
         // Execute the task
@@ -239,6 +254,11 @@ void ThreadPool<Task>::startWorkerThread() noexcept
         // Notify that a task has been completed
         completed_tasks++;
     }
+    
+stop_worker:
+	std::cout << "Exit thread: " << std::hex << std::this_thread::get_id() << std::endl;
+	return;
+	
 }
 
 
