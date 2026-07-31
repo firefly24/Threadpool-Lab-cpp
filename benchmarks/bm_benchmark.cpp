@@ -33,8 +33,37 @@ static void BM_ThreadPoolExecution(benchmark::State& state)
 
 }
 
-//BENCHMARK(BM_ThreadPoolExecution)->Args({100000,1,100000})->Args({100000,2,100000})->Args({100000,4,100000})->Args({100000,6,100000})->Args({100000,8,100000});
+//BENCHMARK(BM_ThreadPoolExecution)->Args({100000,4,100000});
 
-BENCHMARK(BM_ThreadPoolExecution)->Args({100000,4,100000});
+/*
+static void BM_CheckSemaphore(benchmark::State& state)
+{
+	for( auto _: state)
+	{
+		std::counting_semaphore s{0};
+		std::vector<std::thread> threads;
+		for (size_t i = 0; i < 10; ++i) {
+			threads.emplace_back([&s]() {
+			  for (size_t i = 0; i < 1000000; ++i) {
+				s.acquire();
+			  }
+			});
+			threads.emplace_back([&s]() {
+			  for (size_t i = 0; i < 1000000; ++i) {
+				s.release();
+			  }
+			});
+		}
+		for (auto &t : threads) t.join();
+	}
+}
+
+BENCHMARK(BM_CheckSemaphore);
+
+*/
+
+BENCHMARK(BM_ThreadPoolExecution)->Args({100000,1,100000})->Args({100000,2,100000})->Args({100000,4,100000})->Args({100000,6,100000})->Args({100000,8,100000});
+
+
 
 BENCHMARK_MAIN();

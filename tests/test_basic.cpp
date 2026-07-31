@@ -228,7 +228,7 @@ void testGracefulShutdown (int queue_size, int num_workers, int numtasks)
 int main()
 {
 
-	testBasicExecution(100,4,20);
+	testBasicExecution(10000,4,10000);
 	
 	std::cout << "[PASS] Basic execution" << std::endl;
 	
