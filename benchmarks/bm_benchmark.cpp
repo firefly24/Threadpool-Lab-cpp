@@ -1,9 +1,101 @@
 
 #include <benchmark/benchmark.h>
 #include "threadpool/thread_pool.hpp"
+#include "tasks.hpp"
 
-using Task = std::function<void()>;
 
+/**
+ * Benchmark: any Task
+ *
+ * Purpose:
+ *     Measure the throughput of the thread pool.
+ *
+ * Variable:
+ *     Number of worker threads.
+ *
+ * Fixed:
+ *     Queue size
+ *     Number of tasks
+ *     Task body (empty)
+ *
+ * Expected:
+ *     Throughput initially increases with workers and eventually
+ *     plateaus or decreases due to synchronization overhead.
+ */
+ 
+static void BM_TaskScheduling(benchmark::State& state, Task workload)
+{
+	// set-up the parameters
+	int queue_size = state.range(0);
+	int num_workers = state.range(1);
+	int num_tasks = state.range(2);	
+	
+	int total_completed_tasks= 0;
+		
+	for (auto _ : state)
+	{
+		// Construct threadpool
+		ThreadPool<Task> thread_pool(queue_size,num_workers);
+		
+		for(int task=0; task<num_tasks ; task++)
+		{
+			// submit tasks
+			thread_pool.taskSubmit(workload);
+		}
+		
+		// destroy threadpool
+		thread_pool.stopPool();
+		
+		// Update benchmark of completed tasks
+		total_completed_tasks += thread_pool.completedTaskCount();
+	}
+	
+	state.SetItemsProcessed(total_completed_tasks);
+	
+}
+
+BENCHMARK_CAPTURE( BM_TaskScheduling,	// benchmarking function
+					EmptyTask, 			// label for output
+					Task(emptyTask)		// Workload for benchmarking
+				)->ArgsProduct({
+								{100000},
+								{1,2,4,6,8},
+								{100000}
+							   })->UseRealTime();
+ 				
+BENCHMARK_CAPTURE( BM_TaskScheduling,	// benchmarking function
+					SmallTask, 			// label for output
+					Task(smallTask)		// Workload for benchmarking
+				)->ArgsProduct({
+								{100000},
+								{1,2,4,6,8},
+								{100000}
+							   })->UseRealTime();
+			
+BENCHMARK_CAPTURE( BM_TaskScheduling,	// benchmarking function
+					MediumTask, 			// label for output
+					Task(mediumTask)		// Workload for benchmarking
+				)->ArgsProduct({
+								{100000},
+								{1,2,4,6,8},
+								{100000}
+							   })->UseRealTime();
+							   
+							   
+/** Takes quite some time, so run only when benchmarking for heavy workloads
+BENCHMARK_CAPTURE( BM_TaskScheduling,	// benchmarking function
+					LargeTask, 			// label for output
+					Task(largeTask)		// Workload for benchmarking
+				)->ArgsProduct({
+								{100000},
+								{1,2,4,6,8},
+								{100000}
+							   })->UseRealTime();
+
+*/
+//BENCHMARK(BM_EmptyTaskScheduling)->Args({100000,1,100000})->Args({100000,2,100000})->Args({100000,4,100000})->Args({100000,6,100000})->Args({100000,8,100000});
+
+/*
 static void BM_ThreadPoolExecution(benchmark::State& state)
 {
 	int queue_size = state.range(0);
@@ -31,7 +123,7 @@ static void BM_ThreadPoolExecution(benchmark::State& state)
 	
 	state.SetItemsProcessed(accepted);
 
-}
+}*/
 
 //BENCHMARK(BM_ThreadPoolExecution)->Args({100000,4,100000});
 
@@ -62,7 +154,7 @@ BENCHMARK(BM_CheckSemaphore);
 
 */
 
-BENCHMARK(BM_ThreadPoolExecution)->Args({100000,1,100000})->Args({100000,2,100000})->Args({100000,4,100000})->Args({100000,6,100000})->Args({100000,8,100000});
+//BENCHMARK(BM_ThreadPoolExecution)->Args({100000,1,100000})->Args({100000,2,100000})->Args({100000,4,100000})->Args({100000,6,100000})->Args({100000,8,100000});
 
 
 

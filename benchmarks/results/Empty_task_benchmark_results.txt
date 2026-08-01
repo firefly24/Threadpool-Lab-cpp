@@ -1,0 +1,15 @@
+
+Compiler: GCC 16
+Build: Release
+Queue size: 100000
+Tasks: 100000
+Synchronization: counting_semaphore
+
+----------------------------------------------------------------------------------------------------------------
+Benchmark                                                      Time             CPU   Iterations UserCounters...
+----------------------------------------------------------------------------------------------------------------
+BM_TaskScheduling/EmptyTask/100000/1/100000/real_time   69824079 ns     65522307 ns           11 items_per_second=1.43217M/s
+BM_TaskScheduling/EmptyTask/100000/2/100000/real_time  140357009 ns    135988070 ns            5 items_per_second=712.469k/s
+BM_TaskScheduling/EmptyTask/100000/4/100000/real_time  183915600 ns    178301160 ns            4 items_per_second=543.728k/s
+BM_TaskScheduling/EmptyTask/100000/6/100000/real_time  230739913 ns    204191893 ns            3 items_per_second=433.388k/s
+BM_TaskScheduling/EmptyTask/100000/8/100000/real_time  273841035 ns    223738016 ns            3 items_per_second=365.175k/s

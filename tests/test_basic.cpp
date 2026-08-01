@@ -191,7 +191,7 @@ void testGracefulShutdown (int queue_size, int num_workers, int numtasks)
 	
 	auto task_func = [&tasks_executed](){ 
 											std::this_thread::sleep_for(
-																std::chrono::milliseconds(20)
+																std::chrono::microseconds(20)
 															);
 											tasks_executed++; 
 										};
@@ -206,13 +206,13 @@ void testGracefulShutdown (int queue_size, int num_workers, int numtasks)
 											tasks_accepted++;
 											
 										std::this_thread::sleep_for(
-																std::chrono::milliseconds(5)
+																std::chrono::microseconds(5)
 															);
 									}
 								}
 							);
 							
-		std::this_thread::sleep_for(std::chrono::milliseconds(60));
+		std::this_thread::sleep_for(std::chrono::milliseconds(5));
 		
 		thread_pool.stopPool();
 
@@ -228,27 +228,32 @@ void testGracefulShutdown (int queue_size, int num_workers, int numtasks)
 int main()
 {
 
-	testBasicExecution(10000,4,10000);
+	int queue_size = 100000;
+	int numtasks = 100000;
+	int workers = 4;
+	int producers = 4;
+	
+	testBasicExecution(queue_size,workers,numtasks);
 	
 	std::cout << "[PASS] Basic execution" << std::endl;
 	
-	testQueueCapacity(4,10);
+	testQueueCapacity(queue_size,numtasks + 100);
 	
 	std::cout << "[PASS] Queue capacity" << std::endl;
 	
-	testRejectAfterShutdown(10,4,10);
+	testRejectAfterShutdown(queue_size,workers,numtasks);
 	
 	std::cout << "[PASS] Reject after shutdown" << std::endl;
 	
-	testMultipleProducers(8,100,4);
+	testMultipleProducers(workers,numtasks,producers);
 	
 	std::cout << "[PASS] Multiple producers" << std::endl;
 	
-	testMultipleWorkers(10,100);
+	testMultipleWorkers(workers,numtasks);
 	
 	std::cout << "[PASS] Multiple workers" << std::endl;
 	
-	testGracefulShutdown(100,4,60);
+	testGracefulShutdown(queue_size,workers,numtasks);
 	
 	std::cout << "[PASS] Graceful shutdown" << std::endl;
 	

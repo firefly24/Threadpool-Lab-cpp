@@ -1,5 +1,5 @@
 
-CXX := g++
+CXX := g++-16
 CXXFLAGS := -Wall -std=c++20
 INCLUDES := -Iinclude
 
@@ -27,7 +27,7 @@ test:
 	
 	
 benchmark:
-	$(CXX) $(CXXFLAGS) $(INCLUDES) $(BENCH_SRC) -o $(BENCH_TARGET) -lbenchmark -lpthread -g -O0
+	$(CXX) $(CXXFLAGS) $(INCLUDES) $(BENCH_SRC) -o $(BENCH_TARGET) -lbenchmark -lpthread -g -O3 -DNDEBUG
 
 # Plain debug build
 
@@ -39,4 +39,4 @@ benchmark:
 
 # clean artifacts
 clean:
-	rm -f $(TARGET) $(TEST_TARGET)
+	rm -f $(TARGET) $(TEST_TARGET) $(BENCH_TARGET)
