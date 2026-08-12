@@ -80,8 +80,14 @@ ThreadPool<Task>::ThreadPool(std::size_t task_capacity, std::size_t max_workers)
     stop_requested_.store(false, std::memory_order_release);
     
     // Initialize worker threads
-    for (size_t i = 0; i < maxWorkers; i++)
-        worker_threads.emplace_back([this](){ this->startWorkerThread(); }); 
+    for (size_t worker = 0; worker < maxWorkers; worker++)
+        worker_threads.emplace_back([this,worker]() 
+        	{ 
+        		std::string worker_name = "TPWorker-"+ std::to_string(worker);
+    			pthread_setname_np(pthread_self(), worker_name.c_str());
+        		this->startWorkerThread(); 
+        	}
+        ); 
                                  // lamba fn to pop a task from queue to execute
 }
 

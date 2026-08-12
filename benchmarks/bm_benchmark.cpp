@@ -25,6 +25,9 @@
  
 static void BM_TaskScheduling(benchmark::State& state, Task workload)
 {
+	std::string benchmarker_thread_name = "Bench-Main";
+    pthread_setname_np(pthread_self(), benchmarker_thread_name.c_str());	
+	
 	// set-up the parameters
 	int queue_size = state.range(0);
 	int num_workers = state.range(1);
