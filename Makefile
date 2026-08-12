@@ -13,6 +13,10 @@ BENCH_TARGET := run_bench
 #BENCH_SRC := benchmarks/benchmark_threadpool.cpp
 BENCH_SRC := benchmarks/bm_benchmark.cpp
 
+PERFETTO_DIR := third_party/perfetto
+PERFETTO_SRC := $(PERFETTO_DIR)/perfetto.cc
+PERFETTO_OBJ := $(PERFETTO_DIR)/perfetto.o
+
 .PHONY: all test benchmark clean
 
 all: $(TARGET)
@@ -26,8 +30,11 @@ test:
 	$(CXX) $(CXXFLAGS) $(INCLUDES) $(TEST_SRC) -o $(TEST_TARGET) -fsanitize=thread -g -lpthread
 	
 	
-benchmark:
+benchmark: $(PERFETTO_OBJ)
 	$(CXX) $(CXXFLAGS) $(INCLUDES) $(BENCH_SRC) -o $(BENCH_TARGET) -lbenchmark -lpthread -g -O3 -DNDEBUG
+	
+$(PERFETTO_OBJ): $(PERFETTO_SRC)
+	$(CXX) $(CXXFLAGS) -I$(PERFETTO_DIR) -c $(PERFETTO_SRC) -o $(PERFETTO_OBJ)
 
 # Plain debug build
 
@@ -39,4 +46,4 @@ benchmark:
 
 # clean artifacts
 clean:
-	rm -f $(TARGET) $(TEST_TARGET) $(BENCH_TARGET)
+	rm -f $(TARGET) $(TEST_TARGET) $(BENCH_TARGET) $(PERFETTO_OBJ)

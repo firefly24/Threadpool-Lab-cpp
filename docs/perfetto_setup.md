@@ -64,9 +64,13 @@ Verify:
 	out/linux/perfetto --version
 	
 	
-	
-	
-	
+## If want to build perfetto SDK: 
+
+	cd ~/perfetto
+	tools/gen_amalgamated \
+	--output sdk/perfetto \
+	--sdk cpp \
+	--gn_args 'is_clang=false is_system_compiler=true'
 	
 	
 	
