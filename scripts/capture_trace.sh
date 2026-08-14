@@ -12,7 +12,7 @@ TRACE_PID=$!
 
 sleep 1
 
-.$PROJECT_ROOT/run_bench \
+$PROJECT_ROOT/run_bench \
   --benchmark_filter=BM_TaskScheduling/EmptyTask/100000/4/100000
 
 wait "$TRACE_PID"

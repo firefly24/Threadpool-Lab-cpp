@@ -67,12 +67,11 @@ Verify:
 ## If want to build perfetto SDK: 
 
 	cd ~/perfetto
+
 	tools/gen_amalgamated \
-	--output sdk/perfetto \
-	--sdk cpp \
-	--gn_args 'is_clang=false is_system_compiler=true'
-	
-	
-	
+	  --output sdk/perfetto \
+	  --sdk cpp \
+	  --gn_args 'is_clang=false is_system_compiler=true enable_perfetto_re2=false enable_perfetto_zstd=false enable_perfetto_zlib=false enable_perfetto_stderr_crash_dump=false'
+		
 	
 	

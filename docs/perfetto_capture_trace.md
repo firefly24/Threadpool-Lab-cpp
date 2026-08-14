@@ -38,6 +38,9 @@ perfetto.traced_probes should appear under connected producers
 	data_sources: {
   		config {
     		name: "track_event"
+    		track_event_config {
+     			enabled_categories: "threadpool"
+    		}
   		}
   	}
 
