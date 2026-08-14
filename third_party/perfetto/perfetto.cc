@@ -197,810 +197,6 @@ CheckCpuOptimizations() {
 }  // namespace
 
 #endif  // PERFETTO_BUILDFLAG(PERFETTO_X64_CPU_OPT)
-// gen_amalgamated begin source: src/base/debug_crash_stack_trace.cc
-// gen_amalgamated begin header: include/perfetto/ext/base/file_utils.h
-// gen_amalgamated begin header: include/perfetto/base/status.h
-/*
- * Copyright (C) 2019 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-#ifndef INCLUDE_PERFETTO_BASE_STATUS_H_
-#define INCLUDE_PERFETTO_BASE_STATUS_H_
-
-#include <optional>
-#include <string>
-#include <string_view>
-#include <vector>
-
-// gen_amalgamated expanded: #include "perfetto/base/compiler.h"
-// gen_amalgamated expanded: #include "perfetto/base/export.h"
-// gen_amalgamated expanded: #include "perfetto/base/logging.h"
-
-namespace perfetto {
-namespace base {
-
-// Represents either the success or the failure message of a function.
-// This can used as the return type of functions which would usually return an
-// bool for success or int for errno but also wants to add some string context
-// (ususally for logging).
-//
-// Similar to absl::Status, an optional "payload" can also be included with more
-// context about the error. This allows passing additional metadata about the
-// error (e.g. location of errors, potential mitigations etc).
-class PERFETTO_EXPORT_COMPONENT Status {
- public:
-  Status() : ok_(true) {}
-  explicit Status(std::string msg) : ok_(false), message_(std::move(msg)) {
-    PERFETTO_CHECK(!message_.empty());
-  }
-
-  // Copy operations.
-  Status(const Status&) = default;
-  Status& operator=(const Status&) = default;
-
-  // Move operations. The moved-from state is valid but unspecified.
-  Status(Status&&) noexcept = default;
-  Status& operator=(Status&&) = default;
-
-  bool ok() const { return ok_; }
-
-  // When ok() is false this returns the error message. Returns the empty string
-  // otherwise.
-  const std::string& message() const { return message_; }
-  const char* c_message() const { return message_.c_str(); }
-
-  //////////////////////////////////////////////////////////////////////////////
-  // Payload Management APIs
-  //////////////////////////////////////////////////////////////////////////////
-
-  // Payloads can be attached to error statuses to provide additional context.
-  //
-  // Payloads are (key, value) pairs, where the key is a string acting as a
-  // unique "type URL" and the value is an opaque string. The "type URL" should
-  // be unique, follow the format of a URL and, ideally, documentation on how to
-  // interpret its associated data should be available.
-  //
-  // To attach a payload to a status object, call `Status::SetPayload()`.
-  // Similarly, to extract the payload from a status, call
-  // `Status::GetPayload()`.
-  //
-  // Note: the payload APIs are only meaningful to call when the status is an
-  // error. Otherwise, all methods are noops.
-
-  // Gets the payload for the given |type_url| if one exists.
-  //
-  // Will always return std::nullopt if |ok()|.
-  std::optional<std::string_view> GetPayload(std::string_view type_url) const;
-
-  // Sets the payload for the given key. The key should
-  //
-  // Will always do nothing if |ok()|.
-  void SetPayload(std::string_view type_url, std::string value);
-
-  // Erases the payload for the given string and returns true if the payload
-  // existed and was erased.
-  //
-  // Will always do nothing if |ok()|.
-  bool ErasePayload(std::string_view type_url);
-
- private:
-  struct Payload {
-    std::string type_url;
-    std::string payload;
-  };
-
-  bool ok_ = false;
-  std::string message_;
-  std::vector<Payload> payloads_;
-};
-
-// Returns a status object which represents the Ok status.
-inline Status OkStatus() {
-  return Status();
-}
-
-Status ErrStatus(const char* format, ...) PERFETTO_PRINTF_FORMAT(1, 2);
-
-}  // namespace base
-}  // namespace perfetto
-
-#endif  // INCLUDE_PERFETTO_BASE_STATUS_H_
-// gen_amalgamated begin header: include/perfetto/ext/base/scoped_file.h
-/*
- * Copyright (C) 2017 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-#ifndef INCLUDE_PERFETTO_EXT_BASE_SCOPED_FILE_H_
-#define INCLUDE_PERFETTO_EXT_BASE_SCOPED_FILE_H_
-
-// gen_amalgamated expanded: #include "perfetto/base/build_config.h"
-
-#include <stdio.h>
-
-#if !PERFETTO_BUILDFLAG(PERFETTO_OS_WIN)
-#include <dirent.h>  // For DIR* / opendir().
-#endif
-
-#include <string>
-
-// gen_amalgamated expanded: #include "perfetto/base/export.h"
-// gen_amalgamated expanded: #include "perfetto/base/logging.h"
-// gen_amalgamated expanded: #include "perfetto/base/platform_handle.h"
-
-namespace perfetto {
-namespace base {
-
-namespace internal {
-// Used for the most common cases of ScopedResource where there is only one
-// invalid value.
-template <typename T, T InvalidValue>
-struct DefaultValidityChecker {
-  static bool IsValid(T t) { return t != InvalidValue; }
-};
-}  // namespace internal
-
-// RAII classes for auto-releasing fds and dirs.
-// if T is a pointer type, InvalidValue must be nullptr. Doing otherwise
-// causes weird unexpected behaviors (See https://godbolt.org/z/5nGMW4).
-template <typename T,
-          int (*CloseFunction)(T),
-          T InvalidValue,
-          bool CheckClose = true,
-          class Checker = internal::DefaultValidityChecker<T, InvalidValue>>
-class ScopedResource {
- public:
-  using ValidityChecker = Checker;
-  static constexpr T kInvalid = InvalidValue;
-
-  explicit ScopedResource(T t = InvalidValue) : t_(t) {}
-  ScopedResource(ScopedResource&& other) noexcept : t_(other.t_) {
-    other.t_ = InvalidValue;
-  }
-  ScopedResource& operator=(ScopedResource&& other) {
-    reset(other.t_);
-    other.t_ = InvalidValue;
-    return *this;
-  }
-  T get() const { return t_; }
-  T operator*() const { return t_; }
-  explicit operator bool() const { return Checker::IsValid(t_); }
-  void reset(T r = InvalidValue) {
-    if (Checker::IsValid(t_)) {
-      int res = CloseFunction(t_);
-      if (CheckClose)
-        PERFETTO_CHECK(res == 0);
-    }
-    t_ = r;
-  }
-  T release() {
-    T t = t_;
-    t_ = InvalidValue;
-    return t;
-  }
-  ~ScopedResource() { reset(InvalidValue); }
-
- private:
-  ScopedResource(const ScopedResource&) = delete;
-  ScopedResource& operator=(const ScopedResource&) = delete;
-  T t_;
-};
-
-// Declared in file_utils.h. Forward declared to avoid #include cycles.
-int PERFETTO_EXPORT_COMPONENT CloseFile(int fd);
-
-// Use this for file resources obtained via open() and similar APIs.
-using ScopedFile = ScopedResource<int, CloseFile, -1>;
-using ScopedFstream = ScopedResource<FILE*, fclose, nullptr>;
-
-// Use this for resources that are HANDLE on Windows. See comments in
-// platform_handle.h
-#if PERFETTO_BUILDFLAG(PERFETTO_OS_WIN)
-using ScopedPlatformHandle = ScopedResource<PlatformHandle,
-                                            ClosePlatformHandle,
-                                            /*InvalidValue=*/nullptr,
-                                            /*CheckClose=*/true,
-                                            PlatformHandleChecker>;
-#else
-// On non-windows systems we alias ScopedPlatformHandle to ScopedFile because
-// they are really the same. This is to allow assignments between the two in
-// Linux-specific code paths that predate ScopedPlatformHandle.
-static_assert(std::is_same<int, PlatformHandle>::value, "");
-using ScopedPlatformHandle = ScopedFile;
-
-// DIR* does not exist on Windows.
-using ScopedDir = ScopedResource<DIR*, closedir, nullptr>;
-#endif
-
-}  // namespace base
-}  // namespace perfetto
-
-#endif  // INCLUDE_PERFETTO_EXT_BASE_SCOPED_FILE_H_
-// gen_amalgamated begin header: include/perfetto/ext/base/sys_types.h
-/*
- * Copyright (C) 2022 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-#ifndef INCLUDE_PERFETTO_EXT_BASE_SYS_TYPES_H_
-#define INCLUDE_PERFETTO_EXT_BASE_SYS_TYPES_H_
-
-// This headers deals with sys types commonly used in the codebase that are
-// missing on Windows.
-
-#include <sys/types.h>  // IWYU pragma: export
-#include <cstdint>
-
-// gen_amalgamated expanded: #include "perfetto/base/build_config.h"
-
-#if PERFETTO_BUILDFLAG(PERFETTO_OS_WIN)
-
-#ifdef __MINGW32__
-
-using uid_t = int;
-using gid_t = int;
-
-#else
-
-#if !PERFETTO_BUILDFLAG(PERFETTO_COMPILER_GCC)
-// MinGW has these. clang-cl and MSVC, which use just the Windows SDK, don't.
-using uid_t = int;
-using gid_t = int;
-using pid_t = int;
-#endif  // !GCC
-
-#if defined(_WIN64)
-using ssize_t = int64_t;
-#else
-using ssize_t = long;
-#endif  // _WIN64
-
-#endif  // __MINGW32__
-
-#endif  // OS_WIN
-
-#if PERFETTO_BUILDFLAG(PERFETTO_OS_ANDROID)
-// From libcutils' android_filesystem_config.h
-#ifndef AID_ROOT
-#define AID_ROOT 0
-#endif
-#ifndef AID_STATSD
-#define AID_STATSD 1066
-#endif
-#ifndef AID_SHELL
-#define AID_SHELL 2000
-#endif
-#endif
-
-namespace perfetto {
-namespace base {
-
-// The machine ID used in the tracing core.
-using MachineID = uint32_t;
-// The default value reserved for the host trace.
-constexpr MachineID kDefaultMachineID = 0;
-
-constexpr uid_t kInvalidUid = static_cast<uid_t>(-1);
-constexpr pid_t kInvalidPid = static_cast<pid_t>(-1);
-
-}  // namespace base
-}  // namespace perfetto
-
-#endif  // INCLUDE_PERFETTO_EXT_BASE_SYS_TYPES_H_
-/*
- * Copyright (C) 2018 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-#ifndef INCLUDE_PERFETTO_EXT_BASE_FILE_UTILS_H_
-#define INCLUDE_PERFETTO_EXT_BASE_FILE_UTILS_H_
-
-#include <fcntl.h>  // For mode_t & O_RDONLY/RDWR. Exists also on Windows.
-#include <stddef.h>
-
-#include <functional>
-#include <memory>
-#include <optional>
-#include <string>
-#include <vector>
-
-// gen_amalgamated expanded: #include "perfetto/base/build_config.h"
-// gen_amalgamated expanded: #include "perfetto/base/export.h"
-// gen_amalgamated expanded: #include "perfetto/base/status.h"
-// gen_amalgamated expanded: #include "perfetto/ext/base/scoped_file.h"
-// gen_amalgamated expanded: #include "perfetto/ext/base/sys_types.h"
-
-namespace perfetto {
-namespace base {
-
-class TaskRunner;
-
-#if PERFETTO_BUILDFLAG(PERFETTO_OS_WIN)
-using FileOpenMode = int;
-inline constexpr char kDevNull[] = "NUL";
-inline constexpr char kFopenReadFlag[] = "r";
-#else
-using FileOpenMode = mode_t;
-inline constexpr char kDevNull[] = "/dev/null";
-inline constexpr char kFopenReadFlag[] = "re";
-#endif
-
-constexpr FileOpenMode kFileModeInvalid = static_cast<FileOpenMode>(-1);
-
-// Cross-platform variant of ReadFileDescriptor() that takes a PlatformHandle.
-// On Windows normalizes ERROR_BROKEN_PIPE to EOF so behavior matches POSIX.
-bool ReadPlatformHandle(PlatformHandle, std::string* out);
-
-// Reads from |fd|, appending what is currently available into |*out|.
-// Returns:
-//  True: EOF reached (all writers of |fd| have closed their end).
-//  False: read error. On a non-blocking |fd| this includes EAGAIN (no data
-//    currently available but writers are still alive); callers can check
-//    IsAgain(errno) and retry on the next readability notification.
-bool ReadFileDescriptor(int fd, std::string* out);
-
-// Convenience wrapper around ReadFileDescriptor() that takes a FILE*.
-bool ReadFileStream(FILE* f, std::string* out);
-
-// Opens |path| read-only and reads its contents into |*out|.
-// Returns false if the file cannot be opened.
-bool ReadFile(const std::string& path, std::string* out);
-
-// A wrapper around read(2). It deals with Linux vs Windows includes. It also
-// deals with handling EINTR. Has the same semantics of UNIX's read(2).
-ssize_t Read(int fd, void* dst, size_t dst_size);
-
-// Call write until all data is written or an error is detected.
-//
-// man 2 write:
-//   If a write() is interrupted by a signal handler before any bytes are
-//   written, then the call fails with the error EINTR; if it is
-//   interrupted after at least one byte has been written, the call
-//   succeeds, and returns the number of bytes written.
-ssize_t WriteAll(int fd, const void* buf, size_t count);
-
-// Copies all data from |fd_in| to |fd_out|. Saves the offset of |fd_in|,
-// rewinds it to the beginning, copies the content, and restores the offset.
-// |fd_in| can't be a pipe, socket of FIFO.
-base::Status CopyFileContents(int fd_in, int fd_out);
-
-ssize_t WriteAllHandle(PlatformHandle, const void* buf, size_t count);
-
-ScopedFile OpenFile(const std::string& path,
-                    int flags,
-                    FileOpenMode = kFileModeInvalid);
-ScopedFstream OpenFstream(const std::string& path, const std::string& mode);
-
-// This is an alias for close(). It's to avoid leaking windows.h in headers.
-// Exported because ScopedFile is used in the /include/ext API by Chromium
-// component builds.
-int PERFETTO_EXPORT_COMPONENT CloseFile(int fd);
-
-bool FlushFile(int fd);
-
-// Returns true if mkdir succeeds, false if it fails (see errno in that case).
-// `mode` is the permission bits for the new directory; it is ignored on
-// Windows.
-bool Mkdir(const std::string& path, uint32_t mode = 0755);
-
-// Calls rmdir() on UNIX, _rmdir() on Windows.
-bool Rmdir(const std::string& path);
-
-// Removes a file: unlink() on UNIX, _unlink() on Windows. Takes a const char*
-// and is async-signal-safe on POSIX, so it's callable from a signal handler.
-bool Unlink(const char* path);
-
-// Wrapper around access(path, F_OK).
-bool FileExists(const std::string& path);
-
-// Gets the extension for a filename. If the file has two extensions, returns
-// only the last one (foo.pb.gz => .gz). Returns empty string if there is no
-// extension.
-std::string GetFileExtension(const std::string& filename);
-
-// Returns the basename component of a path (the final component after the last
-// directory separator). Behaves like man 2 basename, but works with both '/'
-// and '\' separators for cross-platform compatibility.
-// Examples:
-//   Basename("/usr/bin/ls") => "ls"
-//   Basename("/usr/bin/") => "bin"
-//   Basename("/") => "/"
-//   Basename("foo") => "foo"
-//   Basename("") => "."
-//   Basename("C:\\Windows\\System32") => "System32"
-std::string Basename(const std::string& path);
-
-// Returns the directory component of a path (everything up to but not
-// including the final component). Behaves like man 2 dirname, but works with
-// both '/' and '\' separators for cross-platform compatibility.
-// Examples:
-//   Dirname("/usr/bin/ls") => "/usr/bin"
-//   Dirname("/usr/bin") => "/usr"
-//   Dirname("/") => "/"
-//   Dirname("foo") => "."
-//   Dirname("") => "."
-//   Dirname("C:\\Windows\\System32") => "C:\\Windows"
-std::string Dirname(const std::string& path);
-
-// Puts the path to all files under |dir_path| in |output|, recursively walking
-// subdirectories. File paths are relative to |dir_path|. Only files are
-// included, not directories. Path separator is always '/', even on windows (not
-// '\').
-base::Status ListFilesRecursive(const std::string& dir_path,
-                                std::vector<std::string>& output);
-
-// Lists immediate subdirectories in |dir_path| (non-recursive). Directory names
-// are relative to |dir_path| and do not include the path separator. Returns
-// only directories, not files. Works on both Unix and Windows.
-base::Status ListDirectories(const std::string& dir_path,
-                             std::vector<std::string>& output);
-
-// Sets |path|'s owner group to |group_name| and permission mode bits to
-// |mode_bits|.
-base::Status SetFilePermissions(const std::string& path,
-                                const std::string& group_name,
-                                const std::string& mode_bits);
-
-// Returns the size of the file located at |path|, or nullopt in case of error.
-std::optional<uint64_t> GetFileSize(const std::string& path);
-
-// Returns the size of the open file |fd|, or nullopt in case of error.
-std::optional<uint64_t> GetFileSize(PlatformHandle fd);
-
-// This class uses inotify (on Linux/Android) to watch for the creation of
-// files in the filesystem. When the specified file is created, it triggers a
-// callback function.
-// Destroying the returned unique_ptr will automatically unregister the watch.
-//
-// Note: This only works with filesystem paths (not abstract sockets or other
-// special file types).
-// It's only supported on Linux and Android, it's a no-op (returns nullptr) on
-// other platforms.
-//
-// Usage:
-//   auto watch = LinuxFileWatch::WatchFileCreation(
-//       task_runner, "/tmp/my_file", []() {
-//         // Called when /tmp/my_file is created
-//       });
-class LinuxFileWatch {
- public:
-  // Creates a watcher for file creation. Returns nullptr if the path is not a
-  // valid filesystem path or if the platform doesn't support inotify. The
-  // callback will be invoked on the provided TaskRunner when the file is
-  // created.
-  static std::unique_ptr<LinuxFileWatch> WatchFileCreation(
-      TaskRunner*,
-      const char* path,
-      std::function<void()> callback);
-
-  virtual ~LinuxFileWatch();
-
- protected:
-  LinuxFileWatch() = default;
-};
-
-}  // namespace base
-}  // namespace perfetto
-
-#endif  // INCLUDE_PERFETTO_EXT_BASE_FILE_UTILS_H_
-/*
- * Copyright (C) 2017 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-#include <cxxabi.h>
-#include <dlfcn.h>
-#include <pthread.h>
-#include <signal.h>
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/syscall.h>
-#include <sys/types.h>
-#include <unistd.h>
-#include <unwind.h>
-
-// gen_amalgamated expanded: #include "perfetto/base/build_config.h"
-// gen_amalgamated expanded: #include "perfetto/ext/base/file_utils.h"
-
-// Some glibc headers hit this when using signals.
-#pragma GCC diagnostic push
-#if defined(__clang__)
-#pragma GCC diagnostic ignored "-Wdisabled-macro-expansion"
-#endif
-
-#if defined(NDEBUG)
-#error This translation unit should not be used in release builds
-#endif
-
-#if !PERFETTO_BUILDFLAG(PERFETTO_STANDALONE_BUILD)
-#error This translation unit should not be used in non-standalone builds
-#endif
-
-#if PERFETTO_BUILDFLAG(PERFETTO_OS_LINUX) || \
-    PERFETTO_BUILDFLAG(PERFETTO_OS_ANDROID)
-#include <backtrace.h>
-#endif
-
-namespace {
-
-constexpr size_t kDemangledNameLen = 4096;
-
-bool g_sighandler_registered = false;
-char* g_demangled_name = nullptr;
-
-struct SigHandler {
-  int sig_num;
-  struct sigaction old_handler;
-};
-
-SigHandler g_signals[] = {{SIGSEGV, {}}, {SIGILL, {}}, {SIGTRAP, {}},
-                          {SIGABRT, {}}, {SIGBUS, {}}, {SIGFPE, {}}};
-
-template <typename T>
-void Print(const T& str) {
-  perfetto::base::WriteAll(STDERR_FILENO, str, sizeof(str));
-}
-
-template <typename T>
-void PrintHex(T n) {
-  for (unsigned i = 0; i < sizeof(n) * 8; i += 4) {
-    char nibble = static_cast<char>(n >> (sizeof(n) * 8 - i - 4)) & 0x0F;
-    char c = (nibble < 10) ? '0' + nibble : 'A' + nibble - 10;
-    perfetto::base::WriteAll(STDERR_FILENO, &c, 1);
-  }
-}
-
-struct StackCrawlState {
-  StackCrawlState(uintptr_t* frames_arg, size_t max_depth_arg)
-      : frames(frames_arg),
-        frame_count(0),
-        max_depth(max_depth_arg),
-        skip_count(1) {}
-
-  uintptr_t* frames;
-  size_t frame_count;
-  size_t max_depth;
-  size_t skip_count;
-};
-
-_Unwind_Reason_Code TraceStackFrame(_Unwind_Context* context, void* arg) {
-  StackCrawlState* state = static_cast<StackCrawlState*>(arg);
-  uintptr_t ip = _Unwind_GetIP(context);
-
-  if (ip != 0 && state->skip_count) {
-    state->skip_count--;
-    return _URC_NO_REASON;
-  }
-
-  state->frames[state->frame_count++] = ip;
-  if (state->frame_count >= state->max_depth)
-    return _URC_END_OF_STACK;
-  return _URC_NO_REASON;
-}
-
-void RestoreSignalHandlers() {
-  g_sighandler_registered = false;
-  for (size_t i = 0; i < sizeof(g_signals) / sizeof(g_signals[0]); i++)
-    sigaction(g_signals[i].sig_num, &g_signals[i].old_handler, nullptr);
-}
-
-// Note: use only async-safe functions inside this.
-void SignalHandler(int sig_num, siginfo_t* info, void* /*ucontext*/) {
-  // Restore the old handlers.
-  RestoreSignalHandlers();
-
-  Print("\n------------------ BEGINNING OF CRASH ------------------\n");
-  Print("Signal: ");
-  if (sig_num == SIGSEGV) {
-    Print("Segmentation fault");
-  } else if (sig_num == SIGILL) {
-    Print("Illegal instruction (possibly unaligned access)");
-  } else if (sig_num == SIGTRAP) {
-    Print("Trap");
-  } else if (sig_num == SIGABRT) {
-    Print("Abort");
-  } else if (sig_num == SIGBUS) {
-    Print("Bus Error (possibly unmapped memory access)");
-  } else if (sig_num == SIGFPE) {
-    Print("Floating point exception");
-  } else {
-    Print("Unexpected signal ");
-    PrintHex(static_cast<uint32_t>(sig_num));
-  }
-
-  Print("\n");
-
-  Print("Fault addr: ");
-  PrintHex(reinterpret_cast<uintptr_t>(info->si_addr));
-  Print("\n\nBacktrace:\n");
-
-  const size_t kMaxFrames = 64;
-  uintptr_t frames[kMaxFrames];
-  StackCrawlState unwind_state(frames, kMaxFrames);
-  _Unwind_Backtrace(&TraceStackFrame, &unwind_state);
-
-#if PERFETTO_BUILDFLAG(PERFETTO_OS_LINUX) || \
-    PERFETTO_BUILDFLAG(PERFETTO_OS_ANDROID)
-  auto bt_error = [](void*, const char* msg, int) {
-    Print("libbacktrace error: ");
-    perfetto::base::WriteAll(STDERR_FILENO, msg, strlen(msg));
-    Print("\n");
-  };
-  struct backtrace_state* bt_state =
-      backtrace_create_state(nullptr, 0, bt_error, nullptr);
-#endif
-
-  for (uint8_t i = 0; i < unwind_state.frame_count; i++) {
-    struct SymbolInfo {
-      char sym_name[255];
-      char file_name[255];
-    };
-    SymbolInfo sym{{}, {}};
-
-#if PERFETTO_BUILDFLAG(PERFETTO_OS_LINUX) || \
-    PERFETTO_BUILDFLAG(PERFETTO_OS_ANDROID)
-    auto symbolize_callback = [](void* data, uintptr_t /*pc*/,
-                                 const char* filename, int lineno,
-                                 const char* function) -> int {
-      SymbolInfo* psym = reinterpret_cast<SymbolInfo*>(data);
-      if (function)
-        snprintf(psym->sym_name, sizeof(psym->sym_name), "%s", function);
-      if (filename) {
-        snprintf(psym->file_name, sizeof(psym->file_name), "%s:%d", filename,
-                 lineno);
-      }
-      return 0;
-    };
-    backtrace_pcinfo(bt_state, frames[i], symbolize_callback, bt_error, &sym);
-#else
-    Dl_info dl_info = {};
-    int res = dladdr(reinterpret_cast<void*>(frames[i]), &dl_info);
-    if (res && dl_info.dli_sname)
-      snprintf(sym.sym_name, sizeof(sym.sym_name), "%s", dl_info.dli_sname);
-#endif
-
-    Print("\n#");
-    PrintHex(i);
-    Print("  ");
-
-    if (sym.sym_name[0]) {
-      int ignored;
-      size_t len = kDemangledNameLen;
-      char* demangled =
-          abi::__cxa_demangle(sym.sym_name, g_demangled_name, &len, &ignored);
-      if (demangled) {
-        snprintf(sym.sym_name, sizeof(sym.sym_name), "%s", demangled);
-        // In the exceptional case of demangling something > kDemangledNameLen,
-        // __cxa_demangle will realloc(). In that case the malloc()-ed pointer
-        // might be moved.
-        g_demangled_name = demangled;
-      }
-      perfetto::base::WriteAll(STDERR_FILENO, sym.sym_name,
-                               strlen(sym.sym_name));
-    } else {
-      Print("0x");
-      PrintHex(frames[i]);
-    }
-    if (sym.file_name[0]) {
-      Print("\n     ");
-      perfetto::base::WriteAll(STDERR_FILENO, sym.file_name,
-                               strlen(sym.file_name));
-    }
-    Print("\n");
-  }
-
-  Print("------------------ END OF CRASH ------------------\n");
-
-  // info->si_code <= 0 iff SI_FROMUSER (SI_FROMKERNEL otherwise).
-  if (info->si_code <= 0 || sig_num == SIGABRT) {
-// This signal was triggered by somebody sending us the signal with kill().
-// In order to retrigger it, we have to queue a new signal by calling
-// kill() ourselves.  The special case (si_pid == 0 && sig == SIGABRT) is
-// due to the kernel sending a SIGABRT from a user request via SysRQ.
-#if PERFETTO_BUILDFLAG(PERFETTO_OS_APPLE) || \
-    PERFETTO_BUILDFLAG(PERFETTO_OS_FREEBSD)
-    if (kill(getpid(), sig_num) < 0) {
-#else
-    if (syscall(__NR_tgkill, getpid(), syscall(__NR_gettid), sig_num) < 0) {
-#endif
-      // If we failed to kill ourselves (e.g. because a sandbox disallows us
-      // to do so), we instead resort to terminating our process. This will
-      // result in an incorrect exit code.
-      _exit(1);
-    }
-  }
-}
-
-}  // namespace
-
-namespace perfetto {
-namespace base {
-
-// The prototype for this function is in logging.h.
-void EnableStacktraceOnCrashForDebug() {
-  if (g_sighandler_registered)
-    return;
-  g_sighandler_registered = true;
-
-  // Pre-allocate the string for __cxa_demangle() to reduce the risk of that
-  // invoking realloc() within the signal handler.
-  g_demangled_name = reinterpret_cast<char*>(malloc(kDemangledNameLen));
-  struct sigaction sigact = {};
-  sigact.sa_sigaction = &SignalHandler;
-  sigact.sa_flags = static_cast<decltype(sigact.sa_flags)>(
-      SA_RESTART | SA_SIGINFO | SA_RESETHAND);
-  for (size_t i = 0; i < sizeof(g_signals) / sizeof(g_signals[0]); i++)
-    sigaction(g_signals[i].sig_num, &sigact, &g_signals[i].old_handler);
-
-  // Prevents fork()-ed processes to inherit the crash signal handlers. This
-  // significantly speeds up gtest death tests, because running the unwinder
-  // takes some hundreds of ms. These signal handlers are completely useless
-  // in death tests because: (i) death tests are expected to crash by design;
-  // (ii) the output of death test is not visible.
-  pthread_atfork(nullptr, nullptr, &RestoreSignalHandlers);
-}
-}  // namespace base
-}  // namespace perfetto
-
-#pragma GCC diagnostic pop
 // gen_amalgamated begin source: src/base/android_utils.cc
 // gen_amalgamated begin header: include/perfetto/ext/base/android_utils.h
 /*
@@ -1951,6 +1147,88 @@ std::string GetPerfettoMachineName() {
 // gen_amalgamated begin source: src/base/base64.cc
 // gen_amalgamated begin header: include/perfetto/ext/base/base64.h
 // gen_amalgamated begin header: include/perfetto/ext/base/utils.h
+// gen_amalgamated begin header: include/perfetto/ext/base/sys_types.h
+/*
+ * Copyright (C) 2022 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#ifndef INCLUDE_PERFETTO_EXT_BASE_SYS_TYPES_H_
+#define INCLUDE_PERFETTO_EXT_BASE_SYS_TYPES_H_
+
+// This headers deals with sys types commonly used in the codebase that are
+// missing on Windows.
+
+#include <sys/types.h>  // IWYU pragma: export
+#include <cstdint>
+
+// gen_amalgamated expanded: #include "perfetto/base/build_config.h"
+
+#if PERFETTO_BUILDFLAG(PERFETTO_OS_WIN)
+
+#ifdef __MINGW32__
+
+using uid_t = int;
+using gid_t = int;
+
+#else
+
+#if !PERFETTO_BUILDFLAG(PERFETTO_COMPILER_GCC)
+// MinGW has these. clang-cl and MSVC, which use just the Windows SDK, don't.
+using uid_t = int;
+using gid_t = int;
+using pid_t = int;
+#endif  // !GCC
+
+#if defined(_WIN64)
+using ssize_t = int64_t;
+#else
+using ssize_t = long;
+#endif  // _WIN64
+
+#endif  // __MINGW32__
+
+#endif  // OS_WIN
+
+#if PERFETTO_BUILDFLAG(PERFETTO_OS_ANDROID)
+// From libcutils' android_filesystem_config.h
+#ifndef AID_ROOT
+#define AID_ROOT 0
+#endif
+#ifndef AID_STATSD
+#define AID_STATSD 1066
+#endif
+#ifndef AID_SHELL
+#define AID_SHELL 2000
+#endif
+#endif
+
+namespace perfetto {
+namespace base {
+
+// The machine ID used in the tracing core.
+using MachineID = uint32_t;
+// The default value reserved for the host trace.
+constexpr MachineID kDefaultMachineID = 0;
+
+constexpr uid_t kInvalidUid = static_cast<uid_t>(-1);
+constexpr pid_t kInvalidPid = static_cast<pid_t>(-1);
+
+}  // namespace base
+}  // namespace perfetto
+
+#endif  // INCLUDE_PERFETTO_EXT_BASE_SYS_TYPES_H_
 /*
  * Copyright (C) 2017 The Android Open Source Project
  *
@@ -2544,6 +1822,454 @@ constexpr const char* kCpuInfoFeatures[] = {
 }  // namespace perfetto
 
 #endif  // INCLUDE_PERFETTO_EXT_BASE_CPU_INFO_FEATURES_ALLOWLIST_H_
+// gen_amalgamated begin header: include/perfetto/ext/base/file_utils.h
+// gen_amalgamated begin header: include/perfetto/base/status.h
+/*
+ * Copyright (C) 2019 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#ifndef INCLUDE_PERFETTO_BASE_STATUS_H_
+#define INCLUDE_PERFETTO_BASE_STATUS_H_
+
+#include <optional>
+#include <string>
+#include <string_view>
+#include <vector>
+
+// gen_amalgamated expanded: #include "perfetto/base/compiler.h"
+// gen_amalgamated expanded: #include "perfetto/base/export.h"
+// gen_amalgamated expanded: #include "perfetto/base/logging.h"
+
+namespace perfetto {
+namespace base {
+
+// Represents either the success or the failure message of a function.
+// This can used as the return type of functions which would usually return an
+// bool for success or int for errno but also wants to add some string context
+// (ususally for logging).
+//
+// Similar to absl::Status, an optional "payload" can also be included with more
+// context about the error. This allows passing additional metadata about the
+// error (e.g. location of errors, potential mitigations etc).
+class PERFETTO_EXPORT_COMPONENT Status {
+ public:
+  Status() : ok_(true) {}
+  explicit Status(std::string msg) : ok_(false), message_(std::move(msg)) {
+    PERFETTO_CHECK(!message_.empty());
+  }
+
+  // Copy operations.
+  Status(const Status&) = default;
+  Status& operator=(const Status&) = default;
+
+  // Move operations. The moved-from state is valid but unspecified.
+  Status(Status&&) noexcept = default;
+  Status& operator=(Status&&) = default;
+
+  bool ok() const { return ok_; }
+
+  // When ok() is false this returns the error message. Returns the empty string
+  // otherwise.
+  const std::string& message() const { return message_; }
+  const char* c_message() const { return message_.c_str(); }
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Payload Management APIs
+  //////////////////////////////////////////////////////////////////////////////
+
+  // Payloads can be attached to error statuses to provide additional context.
+  //
+  // Payloads are (key, value) pairs, where the key is a string acting as a
+  // unique "type URL" and the value is an opaque string. The "type URL" should
+  // be unique, follow the format of a URL and, ideally, documentation on how to
+  // interpret its associated data should be available.
+  //
+  // To attach a payload to a status object, call `Status::SetPayload()`.
+  // Similarly, to extract the payload from a status, call
+  // `Status::GetPayload()`.
+  //
+  // Note: the payload APIs are only meaningful to call when the status is an
+  // error. Otherwise, all methods are noops.
+
+  // Gets the payload for the given |type_url| if one exists.
+  //
+  // Will always return std::nullopt if |ok()|.
+  std::optional<std::string_view> GetPayload(std::string_view type_url) const;
+
+  // Sets the payload for the given key. The key should
+  //
+  // Will always do nothing if |ok()|.
+  void SetPayload(std::string_view type_url, std::string value);
+
+  // Erases the payload for the given string and returns true if the payload
+  // existed and was erased.
+  //
+  // Will always do nothing if |ok()|.
+  bool ErasePayload(std::string_view type_url);
+
+ private:
+  struct Payload {
+    std::string type_url;
+    std::string payload;
+  };
+
+  bool ok_ = false;
+  std::string message_;
+  std::vector<Payload> payloads_;
+};
+
+// Returns a status object which represents the Ok status.
+inline Status OkStatus() {
+  return Status();
+}
+
+Status ErrStatus(const char* format, ...) PERFETTO_PRINTF_FORMAT(1, 2);
+
+}  // namespace base
+}  // namespace perfetto
+
+#endif  // INCLUDE_PERFETTO_BASE_STATUS_H_
+// gen_amalgamated begin header: include/perfetto/ext/base/scoped_file.h
+/*
+ * Copyright (C) 2017 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#ifndef INCLUDE_PERFETTO_EXT_BASE_SCOPED_FILE_H_
+#define INCLUDE_PERFETTO_EXT_BASE_SCOPED_FILE_H_
+
+// gen_amalgamated expanded: #include "perfetto/base/build_config.h"
+
+#include <stdio.h>
+
+#if !PERFETTO_BUILDFLAG(PERFETTO_OS_WIN)
+#include <dirent.h>  // For DIR* / opendir().
+#endif
+
+#include <string>
+
+// gen_amalgamated expanded: #include "perfetto/base/export.h"
+// gen_amalgamated expanded: #include "perfetto/base/logging.h"
+// gen_amalgamated expanded: #include "perfetto/base/platform_handle.h"
+
+namespace perfetto {
+namespace base {
+
+namespace internal {
+// Used for the most common cases of ScopedResource where there is only one
+// invalid value.
+template <typename T, T InvalidValue>
+struct DefaultValidityChecker {
+  static bool IsValid(T t) { return t != InvalidValue; }
+};
+}  // namespace internal
+
+// RAII classes for auto-releasing fds and dirs.
+// if T is a pointer type, InvalidValue must be nullptr. Doing otherwise
+// causes weird unexpected behaviors (See https://godbolt.org/z/5nGMW4).
+template <typename T,
+          int (*CloseFunction)(T),
+          T InvalidValue,
+          bool CheckClose = true,
+          class Checker = internal::DefaultValidityChecker<T, InvalidValue>>
+class ScopedResource {
+ public:
+  using ValidityChecker = Checker;
+  static constexpr T kInvalid = InvalidValue;
+
+  explicit ScopedResource(T t = InvalidValue) : t_(t) {}
+  ScopedResource(ScopedResource&& other) noexcept : t_(other.t_) {
+    other.t_ = InvalidValue;
+  }
+  ScopedResource& operator=(ScopedResource&& other) {
+    reset(other.t_);
+    other.t_ = InvalidValue;
+    return *this;
+  }
+  T get() const { return t_; }
+  T operator*() const { return t_; }
+  explicit operator bool() const { return Checker::IsValid(t_); }
+  void reset(T r = InvalidValue) {
+    if (Checker::IsValid(t_)) {
+      int res = CloseFunction(t_);
+      if (CheckClose)
+        PERFETTO_CHECK(res == 0);
+    }
+    t_ = r;
+  }
+  T release() {
+    T t = t_;
+    t_ = InvalidValue;
+    return t;
+  }
+  ~ScopedResource() { reset(InvalidValue); }
+
+ private:
+  ScopedResource(const ScopedResource&) = delete;
+  ScopedResource& operator=(const ScopedResource&) = delete;
+  T t_;
+};
+
+// Declared in file_utils.h. Forward declared to avoid #include cycles.
+int PERFETTO_EXPORT_COMPONENT CloseFile(int fd);
+
+// Use this for file resources obtained via open() and similar APIs.
+using ScopedFile = ScopedResource<int, CloseFile, -1>;
+using ScopedFstream = ScopedResource<FILE*, fclose, nullptr>;
+
+// Use this for resources that are HANDLE on Windows. See comments in
+// platform_handle.h
+#if PERFETTO_BUILDFLAG(PERFETTO_OS_WIN)
+using ScopedPlatformHandle = ScopedResource<PlatformHandle,
+                                            ClosePlatformHandle,
+                                            /*InvalidValue=*/nullptr,
+                                            /*CheckClose=*/true,
+                                            PlatformHandleChecker>;
+#else
+// On non-windows systems we alias ScopedPlatformHandle to ScopedFile because
+// they are really the same. This is to allow assignments between the two in
+// Linux-specific code paths that predate ScopedPlatformHandle.
+static_assert(std::is_same<int, PlatformHandle>::value, "");
+using ScopedPlatformHandle = ScopedFile;
+
+// DIR* does not exist on Windows.
+using ScopedDir = ScopedResource<DIR*, closedir, nullptr>;
+#endif
+
+}  // namespace base
+}  // namespace perfetto
+
+#endif  // INCLUDE_PERFETTO_EXT_BASE_SCOPED_FILE_H_
+/*
+ * Copyright (C) 2018 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#ifndef INCLUDE_PERFETTO_EXT_BASE_FILE_UTILS_H_
+#define INCLUDE_PERFETTO_EXT_BASE_FILE_UTILS_H_
+
+#include <fcntl.h>  // For mode_t & O_RDONLY/RDWR. Exists also on Windows.
+#include <stddef.h>
+
+#include <functional>
+#include <memory>
+#include <optional>
+#include <string>
+#include <vector>
+
+// gen_amalgamated expanded: #include "perfetto/base/build_config.h"
+// gen_amalgamated expanded: #include "perfetto/base/export.h"
+// gen_amalgamated expanded: #include "perfetto/base/status.h"
+// gen_amalgamated expanded: #include "perfetto/ext/base/scoped_file.h"
+// gen_amalgamated expanded: #include "perfetto/ext/base/sys_types.h"
+
+namespace perfetto {
+namespace base {
+
+class TaskRunner;
+
+#if PERFETTO_BUILDFLAG(PERFETTO_OS_WIN)
+using FileOpenMode = int;
+inline constexpr char kDevNull[] = "NUL";
+inline constexpr char kFopenReadFlag[] = "r";
+#else
+using FileOpenMode = mode_t;
+inline constexpr char kDevNull[] = "/dev/null";
+inline constexpr char kFopenReadFlag[] = "re";
+#endif
+
+constexpr FileOpenMode kFileModeInvalid = static_cast<FileOpenMode>(-1);
+
+// Cross-platform variant of ReadFileDescriptor() that takes a PlatformHandle.
+// On Windows normalizes ERROR_BROKEN_PIPE to EOF so behavior matches POSIX.
+bool ReadPlatformHandle(PlatformHandle, std::string* out);
+
+// Reads from |fd|, appending what is currently available into |*out|.
+// Returns:
+//  True: EOF reached (all writers of |fd| have closed their end).
+//  False: read error. On a non-blocking |fd| this includes EAGAIN (no data
+//    currently available but writers are still alive); callers can check
+//    IsAgain(errno) and retry on the next readability notification.
+bool ReadFileDescriptor(int fd, std::string* out);
+
+// Convenience wrapper around ReadFileDescriptor() that takes a FILE*.
+bool ReadFileStream(FILE* f, std::string* out);
+
+// Opens |path| read-only and reads its contents into |*out|.
+// Returns false if the file cannot be opened.
+bool ReadFile(const std::string& path, std::string* out);
+
+// A wrapper around read(2). It deals with Linux vs Windows includes. It also
+// deals with handling EINTR. Has the same semantics of UNIX's read(2).
+ssize_t Read(int fd, void* dst, size_t dst_size);
+
+// Call write until all data is written or an error is detected.
+//
+// man 2 write:
+//   If a write() is interrupted by a signal handler before any bytes are
+//   written, then the call fails with the error EINTR; if it is
+//   interrupted after at least one byte has been written, the call
+//   succeeds, and returns the number of bytes written.
+ssize_t WriteAll(int fd, const void* buf, size_t count);
+
+// Copies all data from |fd_in| to |fd_out|. Saves the offset of |fd_in|,
+// rewinds it to the beginning, copies the content, and restores the offset.
+// |fd_in| can't be a pipe, socket of FIFO.
+base::Status CopyFileContents(int fd_in, int fd_out);
+
+ssize_t WriteAllHandle(PlatformHandle, const void* buf, size_t count);
+
+ScopedFile OpenFile(const std::string& path,
+                    int flags,
+                    FileOpenMode = kFileModeInvalid);
+ScopedFstream OpenFstream(const std::string& path, const std::string& mode);
+
+// This is an alias for close(). It's to avoid leaking windows.h in headers.
+// Exported because ScopedFile is used in the /include/ext API by Chromium
+// component builds.
+int PERFETTO_EXPORT_COMPONENT CloseFile(int fd);
+
+bool FlushFile(int fd);
+
+// Returns true if mkdir succeeds, false if it fails (see errno in that case).
+// `mode` is the permission bits for the new directory; it is ignored on
+// Windows.
+bool Mkdir(const std::string& path, uint32_t mode = 0755);
+
+// Calls rmdir() on UNIX, _rmdir() on Windows.
+bool Rmdir(const std::string& path);
+
+// Removes a file: unlink() on UNIX, _unlink() on Windows. Takes a const char*
+// and is async-signal-safe on POSIX, so it's callable from a signal handler.
+bool Unlink(const char* path);
+
+// Wrapper around access(path, F_OK).
+bool FileExists(const std::string& path);
+
+// Gets the extension for a filename. If the file has two extensions, returns
+// only the last one (foo.pb.gz => .gz). Returns empty string if there is no
+// extension.
+std::string GetFileExtension(const std::string& filename);
+
+// Returns the basename component of a path (the final component after the last
+// directory separator). Behaves like man 2 basename, but works with both '/'
+// and '\' separators for cross-platform compatibility.
+// Examples:
+//   Basename("/usr/bin/ls") => "ls"
+//   Basename("/usr/bin/") => "bin"
+//   Basename("/") => "/"
+//   Basename("foo") => "foo"
+//   Basename("") => "."
+//   Basename("C:\\Windows\\System32") => "System32"
+std::string Basename(const std::string& path);
+
+// Returns the directory component of a path (everything up to but not
+// including the final component). Behaves like man 2 dirname, but works with
+// both '/' and '\' separators for cross-platform compatibility.
+// Examples:
+//   Dirname("/usr/bin/ls") => "/usr/bin"
+//   Dirname("/usr/bin") => "/usr"
+//   Dirname("/") => "/"
+//   Dirname("foo") => "."
+//   Dirname("") => "."
+//   Dirname("C:\\Windows\\System32") => "C:\\Windows"
+std::string Dirname(const std::string& path);
+
+// Puts the path to all files under |dir_path| in |output|, recursively walking
+// subdirectories. File paths are relative to |dir_path|. Only files are
+// included, not directories. Path separator is always '/', even on windows (not
+// '\').
+base::Status ListFilesRecursive(const std::string& dir_path,
+                                std::vector<std::string>& output);
+
+// Lists immediate subdirectories in |dir_path| (non-recursive). Directory names
+// are relative to |dir_path| and do not include the path separator. Returns
+// only directories, not files. Works on both Unix and Windows.
+base::Status ListDirectories(const std::string& dir_path,
+                             std::vector<std::string>& output);
+
+// Sets |path|'s owner group to |group_name| and permission mode bits to
+// |mode_bits|.
+base::Status SetFilePermissions(const std::string& path,
+                                const std::string& group_name,
+                                const std::string& mode_bits);
+
+// Returns the size of the file located at |path|, or nullopt in case of error.
+std::optional<uint64_t> GetFileSize(const std::string& path);
+
+// Returns the size of the open file |fd|, or nullopt in case of error.
+std::optional<uint64_t> GetFileSize(PlatformHandle fd);
+
+// This class uses inotify (on Linux/Android) to watch for the creation of
+// files in the filesystem. When the specified file is created, it triggers a
+// callback function.
+// Destroying the returned unique_ptr will automatically unregister the watch.
+//
+// Note: This only works with filesystem paths (not abstract sockets or other
+// special file types).
+// It's only supported on Linux and Android, it's a no-op (returns nullptr) on
+// other platforms.
+//
+// Usage:
+//   auto watch = LinuxFileWatch::WatchFileCreation(
+//       task_runner, "/tmp/my_file", []() {
+//         // Called when /tmp/my_file is created
+//       });
+class LinuxFileWatch {
+ public:
+  // Creates a watcher for file creation. Returns nullptr if the path is not a
+  // valid filesystem path or if the platform doesn't support inotify. The
+  // callback will be invoked on the provided TaskRunner when the file is
+  // created.
+  static std::unique_ptr<LinuxFileWatch> WatchFileCreation(
+      TaskRunner*,
+      const char* path,
+      std::function<void()> callback);
+
+  virtual ~LinuxFileWatch();
+
+ protected:
+  LinuxFileWatch() = default;
+};
+
+}  // namespace base
+}  // namespace perfetto
+
+#endif  // INCLUDE_PERFETTO_EXT_BASE_FILE_UTILS_H_
 // gen_amalgamated begin header: include/perfetto/ext/base/string_splitter.h
 /*
  * Copyright (C) 2018 The Android Open Source Project
@@ -59814,269 +59540,6 @@ perfetto::base::Status LoadMessageFilterConfig(const TraceFilter& filt,
 }
 
 }  // namespace protozero
-// gen_amalgamated begin source: src/tracing/service/zlib_compressor.cc
-// gen_amalgamated begin header: src/tracing/service/zlib_compressor.h
-/*
- * Copyright (C) 2023 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-#ifndef SRC_TRACING_SERVICE_ZLIB_COMPRESSOR_H_
-#define SRC_TRACING_SERVICE_ZLIB_COMPRESSOR_H_
-
-#include <vector>
-
-// gen_amalgamated expanded: #include "perfetto/base/build_config.h"
-// gen_amalgamated expanded: #include "perfetto/ext/tracing/core/trace_packet.h"
-
-namespace perfetto {
-
-#if PERFETTO_BUILDFLAG(PERFETTO_ZLIB)
-void ZlibCompressFn(std::vector<TracePacket>*);
-#endif
-
-}  // namespace perfetto
-
-#endif  // SRC_TRACING_SERVICE_ZLIB_COMPRESSOR_H_
-// gen_amalgamated begin header: src/tracing/service/packet_compressor_common.h
-/*
- * Copyright (C) 2026 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-#ifndef SRC_TRACING_SERVICE_PACKET_COMPRESSOR_COMMON_H_
-#define SRC_TRACING_SERVICE_PACKET_COMPRESSOR_COMMON_H_
-
-#include <array>
-#include <cstdint>
-#include <cstring>
-
-// gen_amalgamated expanded: #include "perfetto/base/logging.h"
-// gen_amalgamated expanded: #include "perfetto/ext/tracing/core/slice.h"
-// gen_amalgamated expanded: #include "perfetto/protozero/proto_utils.h"
-
-namespace perfetto {
-namespace packet_compressor {
-
-// TODO(sashwinbalaji): Extract the output-slice buffering and packet assembly
-// shared by the zlib and zstd compressors into this header, so each codec is
-// just its own streaming loop.
-
-// Size of each compressed output slice. Mirrors the service's
-// kMaxTracePacketSliceSize.
-inline constexpr size_t kCompressSliceSize = 128 * 1024 - 512;
-
-// Builds the proto preamble (field tag + length) that the zlib and zstd packet
-// compressors prefix to each TracePacket, so the compressed stream itself
-// parses as a valid Trace proto.
-struct Preamble {
-  uint32_t size;
-  std::array<uint8_t, 16> buf;
-};
-
-template <uint32_t id>
-Preamble GetPreamble(size_t sz) {
-  Preamble preamble{};
-  uint8_t* ptr = preamble.buf.data();
-  constexpr uint32_t tag = protozero::proto_utils::MakeTagLengthDelimited(id);
-  ptr = protozero::proto_utils::WriteVarInt(tag, ptr);
-  ptr = protozero::proto_utils::WriteVarInt(sz, ptr);
-  preamble.size =
-      static_cast<uint32_t>(reinterpret_cast<uintptr_t>(ptr) -
-                            reinterpret_cast<uintptr_t>(preamble.buf.data()));
-  PERFETTO_DCHECK(preamble.size < preamble.buf.size());
-  return preamble;
-}
-
-inline Slice PreambleToSlice(const Preamble& preamble) {
-  Slice slice = Slice::Allocate(preamble.size);
-  memcpy(slice.own_data(), preamble.buf.data(), preamble.size);
-  return slice;
-}
-
-}  // namespace packet_compressor
-}  // namespace perfetto
-
-#endif  // SRC_TRACING_SERVICE_PACKET_COMPRESSOR_COMMON_H_
-/*
- * Copyright (C) 2023 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-// gen_amalgamated expanded: #include "src/tracing/service/zlib_compressor.h"
-
-// gen_amalgamated expanded: #include "perfetto/base/build_config.h"
-
-// File compiles to nothing when the buildflag is off (e.g. SDK opt-out).
-#if PERFETTO_BUILDFLAG(PERFETTO_ZLIB)
-
-#include <zlib.h>
-
-// gen_amalgamated expanded: #include "protos/perfetto/trace/trace.pbzero.h"
-// gen_amalgamated expanded: #include "protos/perfetto/trace/trace_packet.pbzero.h"
-// gen_amalgamated expanded: #include "src/tracing/service/packet_compressor_common.h"
-
-namespace perfetto {
-
-namespace {
-
-using packet_compressor::GetPreamble;
-using packet_compressor::kCompressSliceSize;
-using packet_compressor::Preamble;
-using packet_compressor::PreambleToSlice;
-
-// A compressor for `TracePacket`s that uses zlib. The class is exposed for
-// testing.
-class ZlibPacketCompressor {
- public:
-  ZlibPacketCompressor();
-  ~ZlibPacketCompressor();
-
-  // Can be called multiple times, before Finish() is called.
-  void PushPacket(const TracePacket& packet);
-
-  // Returned the compressed data. Can be called at most once. After this call,
-  // the object is unusable (PushPacket should not be called) and must be
-  // destroyed.
-  TracePacket Finish();
-
- private:
-  void PushData(const void* data, uint32_t size);
-  void NewOutputSlice();
-  void PushCurSlice();
-
-  z_stream stream_;
-  size_t total_new_slices_size_ = 0;
-  std::vector<Slice> new_slices_;
-  std::unique_ptr<uint8_t[]> cur_slice_;
-};
-
-ZlibPacketCompressor::ZlibPacketCompressor() {
-  memset(&stream_, 0, sizeof(stream_));
-  int status = deflateInit(&stream_, 6);
-  PERFETTO_CHECK(status == Z_OK);
-}
-
-ZlibPacketCompressor::~ZlibPacketCompressor() {
-  int status = deflateEnd(&stream_);
-  PERFETTO_CHECK(status == Z_OK);
-}
-
-void ZlibPacketCompressor::PushPacket(const TracePacket& packet) {
-  // We need to be able to tokenize packets in the compressed stream, so we
-  // prefix a proto preamble to each packet. The compressed stream looks like a
-  // valid Trace proto.
-  Preamble preamble =
-      GetPreamble<protos::pbzero::Trace::kPacketFieldNumber>(packet.size());
-  PushData(preamble.buf.data(), preamble.size);
-  for (const Slice& slice : packet.slices()) {
-    PushData(slice.start, static_cast<uint32_t>(slice.size));
-  }
-}
-
-void ZlibPacketCompressor::PushData(const void* data, uint32_t size) {
-  stream_.next_in = const_cast<Bytef*>(static_cast<const Bytef*>(data));
-  stream_.avail_in = static_cast<uInt>(size);
-  while (stream_.avail_in != 0) {
-    if (stream_.avail_out == 0) {
-      NewOutputSlice();
-    }
-    int status = deflate(&stream_, Z_NO_FLUSH);
-    PERFETTO_CHECK(status == Z_OK);
-  }
-}
-
-TracePacket ZlibPacketCompressor::Finish() {
-  for (;;) {
-    int status = deflate(&stream_, Z_FINISH);
-    if (status == Z_STREAM_END)
-      break;
-    PERFETTO_CHECK(status == Z_OK || status == Z_BUF_ERROR);
-    NewOutputSlice();
-  }
-
-  PushCurSlice();
-
-  TracePacket packet;
-  packet.AddSlice(PreambleToSlice(
-      GetPreamble<protos::pbzero::TracePacket::kCompressedPacketsFieldNumber>(
-          total_new_slices_size_)));
-  for (auto& slice : new_slices_) {
-    packet.AddSlice(std::move(slice));
-  }
-  return packet;
-}
-
-void ZlibPacketCompressor::NewOutputSlice() {
-  PushCurSlice();
-  cur_slice_ = std::make_unique<uint8_t[]>(kCompressSliceSize);
-  stream_.next_out = reinterpret_cast<Bytef*>(cur_slice_.get());
-  stream_.avail_out = kCompressSliceSize;
-}
-
-void ZlibPacketCompressor::PushCurSlice() {
-  if (cur_slice_) {
-    total_new_slices_size_ += kCompressSliceSize - stream_.avail_out;
-    new_slices_.push_back(Slice::TakeOwnership(
-        std::move(cur_slice_), kCompressSliceSize - stream_.avail_out));
-  }
-}
-
-}  // namespace
-
-void ZlibCompressFn(std::vector<TracePacket>* packets) {
-  if (packets->empty()) {
-    return;
-  }
-
-  ZlibPacketCompressor stream;
-
-  for (const TracePacket& packet : *packets) {
-    stream.PushPacket(packet);
-  }
-
-  TracePacket packet = stream.Finish();
-
-  packets->clear();
-  packets->push_back(std::move(packet));
-}
-
-}  // namespace perfetto
-
-#endif  // PERFETTO_BUILDFLAG(PERFETTO_ZLIB)
 // gen_amalgamated begin source: src/tracing/service/clock.cc
 // gen_amalgamated begin header: src/tracing/service/clock.h
 /*

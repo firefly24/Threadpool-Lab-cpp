@@ -11,6 +11,7 @@
 #include <cassert>
 
 #include "queue/concurrent_queue.hpp"
+#include "perfetto.h"
 
 using namespace std;
 
@@ -197,6 +198,7 @@ void ThreadPool<Task>::startWorkerThread() noexcept
         // Execute the task
         try
         {
+        	TRACE_EVENT("threadpool", "ExecuteTask");
             task();
         }
         catch (...)

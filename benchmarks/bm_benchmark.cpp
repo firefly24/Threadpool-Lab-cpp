@@ -1,8 +1,17 @@
 
 #include <benchmark/benchmark.h>
-#include "threadpool/thread_pool.hpp"
-#include "tasks.hpp"
 
+#include "tasks.hpp"
+#include "perfetto.h"
+
+PERFETTO_DEFINE_CATEGORIES(
+    perfetto::Category("threadpool")
+        .SetDescription("ThreadPool instrumentation")
+);
+
+PERFETTO_TRACK_EVENT_STATIC_STORAGE();
+
+#include "threadpool/thread_pool.hpp"
 
 /**
  * Benchmark: any Task
@@ -159,6 +168,24 @@ BENCHMARK(BM_CheckSemaphore);
 
 //BENCHMARK(BM_ThreadPoolExecution)->Args({100000,1,100000})->Args({100000,2,100000})->Args({100000,4,100000})->Args({100000,6,100000})->Args({100000,8,100000});
 
+int main(int argc, char** argv)
+{
+	perfetto::TracingInitArgs args;
+	args.backends |= perfetto::kSystemBackend;
+	
+	perfetto::Tracing::Initialize(args);
+	perfetto::TrackEvent::Register();
+	
+	::benchmark::Initialize(&argc,argv);
+	
+	if (::benchmark::ReportUnrecognizedArguments(argc,argv))
+		return 1;
+		
+	::benchmark::RunSpecifiedBenchmarks();
+	
+	//std::this_thread::sleep_for(std::chrono::seconds(10));
 
+	return 0;
+}
 
-BENCHMARK_MAIN();
+//BENCHMARK_MAIN();

@@ -31,7 +31,7 @@ test:
 	
 	
 benchmark: $(PERFETTO_OBJ)
-	$(CXX) $(CXXFLAGS) $(INCLUDES) $(BENCH_SRC) -o $(BENCH_TARGET) -lbenchmark -lpthread -g -O3 -DNDEBUG
+	$(CXX) $(CXXFLAGS) $(INCLUDES) -I$(PERFETTO_DIR) $(BENCH_SRC) $(PERFETTO_OBJ) -o $(BENCH_TARGET) -lbenchmark -lpthread -g -O3 #-DNDEBUG
 	
 $(PERFETTO_OBJ): $(PERFETTO_SRC)
 	$(CXX) $(CXXFLAGS) -I$(PERFETTO_DIR) -c $(PERFETTO_SRC) -o $(PERFETTO_OBJ)
