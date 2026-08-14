@@ -4,7 +4,7 @@
 	
 	cd ~/perfetto/out/linux
 
-	sudo ./traced --background
+	./traced --background
 	sudo ./traced_probes --background
 	
 ### Verify : 
@@ -34,6 +34,12 @@ perfetto.traced_probes should appear under connected producers
 		}
 	  }
 	}
+	
+	data_sources: {
+  		config {
+    		name: "track_event"
+  		}
+  	}
 
 	duration_ms: 10000
 	EOF
