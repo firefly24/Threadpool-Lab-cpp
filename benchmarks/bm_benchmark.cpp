@@ -1,5 +1,7 @@
 
 #include <benchmark/benchmark.h>
+#include <chrono>
+#include <iostream>
 
 #include "tasks.hpp"
 #include "threadpool/instrumentation/tracing.hpp"
@@ -37,24 +39,45 @@ static void BM_TaskScheduling(benchmark::State& state, Task workload)
 	int num_tasks = state.range(2);	
 	
 	int total_completed_tasks= 0;
+	
+	std::chrono::nanoseconds total_producer_time{0};
+	//double total_producer_time_ms =0;
 		
+	int total_tasks =0.0;
+	
 	for (auto _ : state)
 	{
 		// Construct threadpool
 		ThreadPool<Task> thread_pool(queue_size,num_workers);
 		
-		for(int task=0; task<num_tasks ; task++)
+		auto start = std::chrono::steady_clock::now();
 		{
-			// submit tasks
-			thread_pool.taskSubmit(workload);
+			TP_TRACE_EVENT("ProducerBatchSubmit");
+			for(int task=0; task<num_tasks ; task++)
+			{
+				// submit tasks
+				thread_pool.taskSubmit(workload);
+			}
 		}
-		
+		auto end = std::chrono::steady_clock::now();
 		// destroy threadpool
 		thread_pool.stopPool();
+		
+		//total_producer_time_ms += std::chrono::duration<double, std::milli>(end - start).count();
+		total_producer_time += std::chrono::duration_cast<std::chrono::nanoseconds>(end-start);
+		total_tasks += num_tasks;
 		
 		// Update benchmark of completed tasks
 		total_completed_tasks += thread_pool.completedTaskCount();
 	}
+	
+	double producer_duration = std::chrono::duration<double>(total_producer_time).count();
+	
+	std::cout << "Total tasks: " << total_tasks << std::endl;
+	std::cout << "Completed tasks: " << total_completed_tasks << std::endl;
+	std::cout << "Producer throughput: " 
+		<< ((double)total_tasks/producer_duration/1000.0) <<"k/s" << std::endl;
+	std::cout << "Producer duration: " << producer_duration << std::endl;
 	
 	state.SetItemsProcessed(total_completed_tasks);
 	
@@ -65,7 +88,7 @@ BENCHMARK_CAPTURE( BM_TaskScheduling,	// benchmarking function
 					Task(emptyTask)		// Workload for benchmarking
 				)->ArgsProduct({
 								{100000},
-								{1,2,4,6,8},
+								{1,2,3,4,5,6,8},
 								{100000}
 							   })->UseRealTime();
  				
@@ -74,7 +97,7 @@ BENCHMARK_CAPTURE( BM_TaskScheduling,	// benchmarking function
 					Task(smallTask)		// Workload for benchmarking
 				)->ArgsProduct({
 								{100000},
-								{1,2,4,6,8},
+								{1,2,3,4,5,6,8},
 								{100000}
 							   })->UseRealTime();
 			
@@ -83,7 +106,7 @@ BENCHMARK_CAPTURE( BM_TaskScheduling,	// benchmarking function
 					Task(mediumTask)		// Workload for benchmarking
 				)->ArgsProduct({
 								{100000},
-								{1,2,4,6,8},
+								{1,2,3,4,5,6,8},
 								{100000}
 							   })->UseRealTime();
 							   
