@@ -11,7 +11,7 @@
 #include <cassert>
 
 #include "queue/concurrent_queue.hpp"
-#include "perfetto.h"
+#include "./instrumentation/tracing.hpp"
 
 using namespace std;
 
@@ -198,7 +198,7 @@ void ThreadPool<Task>::startWorkerThread() noexcept
         // Execute the task
         try
         {
-        	TRACE_EVENT("threadpool", "ExecuteTask");
+        	TP_TRACE_EVENT("ExecuteTask");
             task();
         }
         catch (...)

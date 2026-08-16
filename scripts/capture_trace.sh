@@ -7,13 +7,15 @@ TRACE="$TRACE_DIR/threadpool-sched.perfetto-trace"
 PERFETTO="$HOME/perfetto/out/linux/perfetto"
 CONFIG="$HOME/perfetto/out/linux/sched.cfg"
 
+BENCH="$1"
+
 sudo "$PERFETTO" --txt -c "$CONFIG" -o "$TRACE" &
 TRACE_PID=$!
 
 sleep 1
 
-$PROJECT_ROOT/run_bench \
-  --benchmark_filter=BM_TaskScheduling/EmptyTask/100000/4/100000
+$PROJECT_ROOT/$BENCH \
+  --benchmark_filter=BM_TaskScheduling/SmallTask/100000/4/100000
 
 wait "$TRACE_PID"
 

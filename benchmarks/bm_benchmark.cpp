@@ -2,14 +2,8 @@
 #include <benchmark/benchmark.h>
 
 #include "tasks.hpp"
-#include "perfetto.h"
+#include "threadpool/instrumentation/tracing.hpp"
 
-PERFETTO_DEFINE_CATEGORIES(
-    perfetto::Category("threadpool")
-        .SetDescription("ThreadPool instrumentation")
-);
-
-PERFETTO_TRACK_EVENT_STATIC_STORAGE();
 
 #include "threadpool/thread_pool.hpp"
 
@@ -170,11 +164,8 @@ BENCHMARK(BM_CheckSemaphore);
 
 int main(int argc, char** argv)
 {
-	perfetto::TracingInitArgs args;
-	args.backends |= perfetto::kSystemBackend;
-	
-	perfetto::Tracing::Initialize(args);
-	perfetto::TrackEvent::Register();
+
+	tracing::threadpool::initialize();
 	
 	::benchmark::Initialize(&argc,argv);
 	
