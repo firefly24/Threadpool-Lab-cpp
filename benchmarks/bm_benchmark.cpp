@@ -38,6 +38,8 @@ static void BM_TaskScheduling(benchmark::State& state, Task workload)
 	int num_workers = state.range(1);
 	int num_tasks = state.range(2);	
 	
+	unsigned int batch_size = state.range(3);
+	
 	int total_completed_tasks= 0;
 	
 	std::chrono::nanoseconds total_producer_time{0};
@@ -48,7 +50,7 @@ static void BM_TaskScheduling(benchmark::State& state, Task workload)
 	for (auto _ : state)
 	{
 		// Construct threadpool
-		ThreadPool<Task> thread_pool(queue_size,num_workers);
+		ThreadPool<Task> thread_pool(queue_size,num_workers,batch_size);
 		
 		auto start = std::chrono::steady_clock::now();
 		{
@@ -89,7 +91,8 @@ BENCHMARK_CAPTURE( BM_TaskScheduling,	// benchmarking function
 				)->ArgsProduct({
 								{100000},
 								{1,2,3,4,5,6,8},
-								{100000}
+								{100000},
+								{2,4,6,8}
 							   })->UseRealTime();
  				
 BENCHMARK_CAPTURE( BM_TaskScheduling,	// benchmarking function
@@ -98,7 +101,8 @@ BENCHMARK_CAPTURE( BM_TaskScheduling,	// benchmarking function
 				)->ArgsProduct({
 								{100000},
 								{1,2,3,4,5,6,8},
-								{100000}
+								{100000},
+								{2,4,6,8}
 							   })->UseRealTime();
 			
 BENCHMARK_CAPTURE( BM_TaskScheduling,	// benchmarking function
@@ -106,8 +110,9 @@ BENCHMARK_CAPTURE( BM_TaskScheduling,	// benchmarking function
 					Task(mediumTask)		// Workload for benchmarking
 				)->ArgsProduct({
 								{100000},
-								{1,2,3,4,5,6,8},
-								{100000}
+								{1,2,4,6,8},
+								{100000},
+								{2,4,6,8}
 							   })->UseRealTime();
 							   
 							   
@@ -118,7 +123,8 @@ BENCHMARK_CAPTURE( BM_TaskScheduling,	// benchmarking function
 				)->ArgsProduct({
 								{100000},
 								{1,2,4,6,8},
-								{100000}
+								{100000},
+								{1,2,4,6,8}
 							   })->UseRealTime();
 
 */
