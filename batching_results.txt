@@ -1,0 +1,349 @@
+Total tasks: 100000
+Completed tasks: 100000
+Total tasks: 500000
+Completed tasks: 500000
+-------------------------------------------------------------------------------------------------------------------
+Benchmark                                                         Time             CPU   Iterations UserCounters...
+-------------------------------------------------------------------------------------------------------------------
+BM_TaskScheduling/EmptyTask/100000/1/100000/2/real_time   108854074 ns    100778707 ns            5 items_per_second=918.661k/s producer_items_per_second=948.359k
+Total tasks: 100000
+Completed tasks: 100000
+Total tasks: 500000
+Completed tasks: 500000
+BM_TaskScheduling/EmptyTask/100000/2/100000/2/real_time   139630080 ns    134942598 ns            5 items_per_second=716.178k/s producer_items_per_second=716.86k
+Total tasks: 100000
+Completed tasks: 100000
+Total tasks: 500000
+Completed tasks: 500000
+BM_TaskScheduling/EmptyTask/100000/3/100000/2/real_time   131839141 ns    127959808 ns            5 items_per_second=758.5k/s producer_items_per_second=759.402k
+Total tasks: 100000
+Completed tasks: 100000
+Total tasks: 500000
+Completed tasks: 500000
+BM_TaskScheduling/EmptyTask/100000/4/100000/2/real_time   141594508 ns    137963731 ns            5 items_per_second=706.242k/s producer_items_per_second=707.157k
+Total tasks: 100000
+Completed tasks: 100000
+Total tasks: 500000
+Completed tasks: 500000
+BM_TaskScheduling/EmptyTask/100000/5/100000/2/real_time   108465672 ns    105270726 ns            5 items_per_second=921.951k/s producer_items_per_second=924.109k
+Total tasks: 100000
+Completed tasks: 100000
+Total tasks: 700000
+Completed tasks: 700000
+BM_TaskScheduling/EmptyTask/100000/6/100000/2/real_time    92551154 ns     89831159 ns            7 items_per_second=1080.48k/s producer_items_per_second=1086.38k
+Total tasks: 100000
+Completed tasks: 100000
+Total tasks: 600000
+Completed tasks: 600000
+BM_TaskScheduling/EmptyTask/100000/8/100000/2/real_time   143483217 ns    126474736 ns            6 items_per_second=696.946k/s producer_items_per_second=700.149k
+Total tasks: 100000
+Completed tasks: 100000
+Total tasks: 1000000
+Completed tasks: 1000000
+BM_TaskScheduling/EmptyTask/100000/1/100000/4/real_time   112707076 ns    104774803 ns           10 items_per_second=887.256k/s producer_items_per_second=888.112k
+Total tasks: 100000
+Completed tasks: 100000
+Total tasks: 600000
+Completed tasks: 600000
+BM_TaskScheduling/EmptyTask/100000/2/100000/4/real_time   112111463 ns    107991280 ns            6 items_per_second=891.969k/s producer_items_per_second=892.888k
+Total tasks: 100000
+Completed tasks: 100000
+Total tasks: 600000
+Completed tasks: 600000
+BM_TaskScheduling/EmptyTask/100000/3/100000/4/real_time   109417301 ns    106090336 ns            6 items_per_second=913.932k/s producer_items_per_second=915.138k
+Total tasks: 100000
+Completed tasks: 100000
+Total tasks: 600000
+Completed tasks: 600000
+BM_TaskScheduling/EmptyTask/100000/4/100000/4/real_time   115254480 ns    112120517 ns            6 items_per_second=867.645k/s producer_items_per_second=868.849k
+Total tasks: 100000
+Completed tasks: 100000
+Total tasks: 600000
+Completed tasks: 600000
+BM_TaskScheduling/EmptyTask/100000/5/100000/4/real_time   117661503 ns    114576373 ns            6 items_per_second=849.896k/s producer_items_per_second=851.553k
+Total tasks: 100000
+Completed tasks: 100000
+Total tasks: 600000
+Completed tasks: 600000
+BM_TaskScheduling/EmptyTask/100000/6/100000/4/real_time   111479673 ns    107169189 ns            6 items_per_second=897.025k/s producer_items_per_second=899.879k
+Total tasks: 100000
+Completed tasks: 100000
+Total tasks: 600000
+Completed tasks: 600000
+BM_TaskScheduling/EmptyTask/100000/8/100000/4/real_time   110962690 ns     90655429 ns            6 items_per_second=901.204k/s producer_items_per_second=906.438k
+Total tasks: 100000
+Completed tasks: 100000
+Total tasks: 1000000
+Completed tasks: 1000000
+BM_TaskScheduling/EmptyTask/100000/1/100000/6/real_time    97055996 ns     91388627 ns           10 items_per_second=1030.33k/s producer_items_per_second=1031.56k
+Total tasks: 100000
+Completed tasks: 100000
+Total tasks: 600000
+Completed tasks: 600000
+BM_TaskScheduling/EmptyTask/100000/2/100000/6/real_time   105136025 ns     99348224 ns            6 items_per_second=951.149k/s producer_items_per_second=952.173k
+Total tasks: 100000
+Completed tasks: 100000
+Total tasks: 700000
+Completed tasks: 700000
+BM_TaskScheduling/EmptyTask/100000/3/100000/6/real_time   102627799 ns     98435717 ns            7 items_per_second=974.395k/s producer_items_per_second=975.552k
+Total tasks: 100000
+Completed tasks: 100000
+Total tasks: 700000
+Completed tasks: 700000
+BM_TaskScheduling/EmptyTask/100000/4/100000/6/real_time   106133737 ns    102310158 ns            7 items_per_second=942.207k/s producer_items_per_second=943.573k
+Total tasks: 100000
+Completed tasks: 100000
+Total tasks: 700000
+Completed tasks: 700000
+BM_TaskScheduling/EmptyTask/100000/5/100000/6/real_time    76649658 ns     73391191 ns            7 items_per_second=1.30464M/s producer_items_per_second=1.30914M
+Total tasks: 100000
+Completed tasks: 100000
+Total tasks: 700000
+Completed tasks: 700000
+BM_TaskScheduling/EmptyTask/100000/6/100000/6/real_time   111902606 ns    101156571 ns            7 items_per_second=893.634k/s producer_items_per_second=900.51k
+Total tasks: 100000
+Completed tasks: 100000
+Total tasks: 400000
+Completed tasks: 400000
+Total tasks: 600000
+Completed tasks: 600000
+BM_TaskScheduling/EmptyTask/100000/8/100000/6/real_time   106654898 ns     94463019 ns            6 items_per_second=937.603k/s producer_items_per_second=943.344k
+Total tasks: 100000
+Completed tasks: 100000
+Total tasks: 700000
+Completed tasks: 700000
+Total tasks: 1700000
+Completed tasks: 1700000
+BM_TaskScheduling/EmptyTask/100000/1/100000/8/real_time   100871265 ns     93901536 ns           17 items_per_second=991.363k/s producer_items_per_second=992.322k
+Total tasks: 100000
+Completed tasks: 100000
+Total tasks: 700000
+Completed tasks: 700000
+BM_TaskScheduling/EmptyTask/100000/2/100000/8/real_time   106097356 ns     98820165 ns            7 items_per_second=942.531k/s producer_items_per_second=943.509k
+Total tasks: 100000
+Completed tasks: 100000
+Total tasks: 700000
+Completed tasks: 700000
+BM_TaskScheduling/EmptyTask/100000/3/100000/8/real_time   100099968 ns     95519977 ns            7 items_per_second=999.001k/s producer_items_per_second=1000.3k
+Total tasks: 100000
+Completed tasks: 100000
+Total tasks: 700000
+Completed tasks: 700000
+BM_TaskScheduling/EmptyTask/100000/4/100000/8/real_time   104187467 ns     99715314 ns            7 items_per_second=959.808k/s producer_items_per_second=961.207k
+Total tasks: 100000
+Completed tasks: 100000
+Total tasks: 600000
+Completed tasks: 600000
+BM_TaskScheduling/EmptyTask/100000/5/100000/8/real_time   119368503 ns    105138741 ns            6 items_per_second=837.742k/s producer_items_per_second=839.349k
+Total tasks: 100000
+Completed tasks: 100000
+Total tasks: 500000
+Completed tasks: 500000
+Total tasks: 900000
+Completed tasks: 900000
+BM_TaskScheduling/EmptyTask/100000/6/100000/8/real_time    90906438 ns     86063872 ns            9 items_per_second=1.10003M/s producer_items_per_second=1.10448M
+Total tasks: 100000
+Completed tasks: 100000
+Total tasks: 700000
+Completed tasks: 700000
+BM_TaskScheduling/EmptyTask/100000/8/100000/8/real_time   106194707 ns     95794683 ns            7 items_per_second=941.667k/s producer_items_per_second=947.628k
+Total tasks: 100000
+Completed tasks: 100000
+Total tasks: 200000
+Completed tasks: 200000
+BM_TaskScheduling/SmallTask/100000/1/100000/2/real_time   325883433 ns     15871264 ns            2 items_per_second=306.858k/s producer_items_per_second=6.28388M
+Total tasks: 100000
+Completed tasks: 100000
+Total tasks: 400000
+Completed tasks: 400000
+BM_TaskScheduling/SmallTask/100000/2/100000/2/real_time   188438543 ns     28245384 ns            4 items_per_second=530.677k/s producer_items_per_second=3.53183M
+Total tasks: 100000
+Completed tasks: 100000
+Total tasks: 500000
+Completed tasks: 500000
+BM_TaskScheduling/SmallTask/100000/3/100000/2/real_time   154177605 ns     37859622 ns            5 items_per_second=648.603k/s producer_items_per_second=2.60703M
+Total tasks: 100000
+Completed tasks: 100000
+Total tasks: 600000
+Completed tasks: 600000
+BM_TaskScheduling/SmallTask/100000/4/100000/2/real_time   117576579 ns     55017680 ns            6 items_per_second=850.51k/s producer_items_per_second=1.67653M
+Total tasks: 100000
+Completed tasks: 100000
+Total tasks: 500000
+Completed tasks: 500000
+BM_TaskScheduling/SmallTask/100000/5/100000/2/real_time   118548907 ns     79248768 ns            5 items_per_second=843.534k/s producer_items_per_second=1059.3k
+Total tasks: 100000
+Completed tasks: 100000
+Total tasks: 700000
+Completed tasks: 700000
+BM_TaskScheduling/SmallTask/100000/6/100000/2/real_time   136289765 ns     75981280 ns            7 items_per_second=733.731k/s producer_items_per_second=774.723k
+Total tasks: 100000
+Completed tasks: 100000
+Total tasks: 800000
+Completed tasks: 800000
+BM_TaskScheduling/SmallTask/100000/8/100000/2/real_time   111844986 ns     70513508 ns            8 items_per_second=894.095k/s producer_items_per_second=913.875k
+Total tasks: 100000
+Completed tasks: 100000
+Total tasks: 200000
+Completed tasks: 200000
+BM_TaskScheduling/SmallTask/100000/1/100000/4/real_time   301016179 ns      8051184 ns            2 items_per_second=332.208k/s producer_items_per_second=12.2939M
+Total tasks: 100000
+Completed tasks: 100000
+Total tasks: 400000
+Completed tasks: 400000
+BM_TaskScheduling/SmallTask/100000/2/100000/4/real_time   165710822 ns      9965064 ns            4 items_per_second=603.461k/s producer_items_per_second=9.78383M
+Total tasks: 100000
+Completed tasks: 100000
+Total tasks: 500000
+Completed tasks: 500000
+BM_TaskScheduling/SmallTask/100000/3/100000/4/real_time   128466755 ns     18993645 ns            5 items_per_second=778.412k/s producer_items_per_second=5.02684M
+Total tasks: 100000
+Completed tasks: 100000
+Total tasks: 700000
+Completed tasks: 700000
+BM_TaskScheduling/SmallTask/100000/4/100000/4/real_time   111660255 ns     31405577 ns            7 items_per_second=895.574k/s producer_items_per_second=2.50973M
+Total tasks: 100000
+Completed tasks: 100000
+Total tasks: 800000
+Completed tasks: 800000
+BM_TaskScheduling/SmallTask/100000/5/100000/4/real_time    90408916 ns     37199020 ns            8 items_per_second=1.10609M/s producer_items_per_second=2.3275M
+Total tasks: 100000
+Completed tasks: 100000
+Total tasks: 900000
+Completed tasks: 900000
+BM_TaskScheduling/SmallTask/100000/6/100000/4/real_time    77887221 ns     28320494 ns            9 items_per_second=1.28391M/s producer_items_per_second=1.99835M
+Total tasks: 100000
+Completed tasks: 100000
+Total tasks: 1000000
+Completed tasks: 1000000
+BM_TaskScheduling/SmallTask/100000/8/100000/4/real_time    78029497 ns     35703677 ns           10 items_per_second=1.28157M/s producer_items_per_second=1.53174M
+Total tasks: 100000
+Completed tasks: 100000
+Total tasks: 200000
+Completed tasks: 200000
+BM_TaskScheduling/SmallTask/100000/1/100000/6/real_time   304284132 ns     13941024 ns            2 items_per_second=328.64k/s producer_items_per_second=7.14451M
+Total tasks: 100000
+Completed tasks: 100000
+Total tasks: 400000
+Completed tasks: 400000
+BM_TaskScheduling/SmallTask/100000/2/100000/6/real_time   172125782 ns     18496432 ns            4 items_per_second=580.97k/s producer_items_per_second=5.37295M
+Total tasks: 100000
+Completed tasks: 100000
+Total tasks: 600000
+Completed tasks: 600000
+BM_TaskScheduling/SmallTask/100000/3/100000/6/real_time   133824485 ns     21762933 ns            6 items_per_second=747.247k/s producer_items_per_second=4.52072M
+Total tasks: 100000
+Completed tasks: 100000
+Total tasks: 700000
+Completed tasks: 700000
+BM_TaskScheduling/SmallTask/100000/4/100000/6/real_time    99960892 ns     25995945 ns            7 items_per_second=1000.39k/s producer_items_per_second=2.98921M
+Total tasks: 100000
+Completed tasks: 100000
+Total tasks: 800000
+Completed tasks: 800000
+BM_TaskScheduling/SmallTask/100000/5/100000/6/real_time    91458441 ns     32515028 ns            8 items_per_second=1093.39k/s producer_items_per_second=2.59988M
+Total tasks: 100000
+Completed tasks: 100000
+Total tasks: 900000
+Completed tasks: 900000
+BM_TaskScheduling/SmallTask/100000/6/100000/6/real_time    77525448 ns     27414457 ns            9 items_per_second=1.2899M/s producer_items_per_second=1.97435M
+Total tasks: 100000
+Completed tasks: 100000
+Total tasks: 1100000
+Completed tasks: 1100000
+BM_TaskScheduling/SmallTask/100000/8/100000/6/real_time    71053999 ns     24493344 ns           11 items_per_second=1.40738M/s producer_items_per_second=2.08879M
+Total tasks: 100000
+Completed tasks: 100000
+Total tasks: 200000
+Completed tasks: 200000
+BM_TaskScheduling/SmallTask/100000/1/100000/8/real_time   302885232 ns      8159312 ns            2 items_per_second=330.158k/s producer_items_per_second=12.369M
+Total tasks: 100000
+Completed tasks: 100000
+Total tasks: 400000
+Completed tasks: 400000
+BM_TaskScheduling/SmallTask/100000/2/100000/8/real_time   163412380 ns      9565488 ns            4 items_per_second=611.949k/s producer_items_per_second=10.5379M
+Total tasks: 100000
+Completed tasks: 100000
+Total tasks: 500000
+Completed tasks: 500000
+BM_TaskScheduling/SmallTask/100000/3/100000/8/real_time   119440517 ns     11555302 ns            5 items_per_second=837.237k/s producer_items_per_second=8.1362M
+Total tasks: 100000
+Completed tasks: 100000
+Total tasks: 700000
+Completed tasks: 700000
+BM_TaskScheduling/SmallTask/100000/4/100000/8/real_time    98311161 ns     15419026 ns            7 items_per_second=1017.18k/s producer_items_per_second=5.23664M
+Total tasks: 100000
+Completed tasks: 100000
+Total tasks: 800000
+Completed tasks: 800000
+BM_TaskScheduling/SmallTask/100000/5/100000/8/real_time    88589720 ns     26726612 ns            8 items_per_second=1.1288M/s producer_items_per_second=3.09417M
+Total tasks: 100000
+Completed tasks: 100000
+Total tasks: 900000
+Completed tasks: 900000
+BM_TaskScheduling/SmallTask/100000/6/100000/8/real_time    75591954 ns     24750094 ns            9 items_per_second=1.32289M/s producer_items_per_second=2.15288M
+Total tasks: 100000
+Completed tasks: 100000
+Total tasks: 1000000
+Completed tasks: 1000000
+BM_TaskScheduling/SmallTask/100000/8/100000/8/real_time    72230516 ns     25530371 ns           10 items_per_second=1.38446M/s producer_items_per_second=1.84411M
+Total tasks: 100000
+Completed tasks: 100000
+BM_TaskScheduling/MediumTask/100000/1/100000/2/real_time 28977415636 ns      8640896 ns            1 items_per_second=3.45096k/s producer_items_per_second=11.2338M
+Total tasks: 100000
+Completed tasks: 100000
+BM_TaskScheduling/MediumTask/100000/2/100000/2/real_time 14515849924 ns      7977504 ns            1 items_per_second=6.88902k/s producer_items_per_second=11.7152M
+Total tasks: 100000
+Completed tasks: 100000
+BM_TaskScheduling/MediumTask/100000/4/100000/2/real_time 7275375114 ns      7136640 ns            1 items_per_second=13.745k/s producer_items_per_second=13.1678M
+Total tasks: 100000
+Completed tasks: 100000
+BM_TaskScheduling/MediumTask/100000/6/100000/2/real_time 4945827992 ns     11219648 ns            1 items_per_second=20.2191k/s producer_items_per_second=8.32006M
+Total tasks: 100000
+Completed tasks: 100000
+BM_TaskScheduling/MediumTask/100000/8/100000/2/real_time 4931847046 ns      7859200 ns            1 items_per_second=20.2764k/s producer_items_per_second=5.63107M
+Total tasks: 100000
+Completed tasks: 100000
+BM_TaskScheduling/MediumTask/100000/1/100000/4/real_time 28980696637 ns     11322880 ns            1 items_per_second=3.45057k/s producer_items_per_second=8.69089M
+Total tasks: 100000
+Completed tasks: 100000
+BM_TaskScheduling/MediumTask/100000/2/100000/4/real_time 14504254775 ns     12037440 ns            1 items_per_second=6.89453k/s producer_items_per_second=8.39153M
+Total tasks: 100000
+Completed tasks: 100000
+BM_TaskScheduling/MediumTask/100000/4/100000/4/real_time 7266523042 ns     12273760 ns            1 items_per_second=13.7617k/s producer_items_per_second=8.24426M
+Total tasks: 100000
+Completed tasks: 100000
+BM_TaskScheduling/MediumTask/100000/6/100000/4/real_time 4917721882 ns      8251424 ns            1 items_per_second=20.3346k/s producer_items_per_second=11.9823M
+Total tasks: 100000
+Completed tasks: 100000
+BM_TaskScheduling/MediumTask/100000/8/100000/4/real_time 4929526348 ns      8366112 ns            1 items_per_second=20.2859k/s producer_items_per_second=5.13838M
+Total tasks: 100000
+Completed tasks: 100000
+BM_TaskScheduling/MediumTask/100000/1/100000/6/real_time 28998668508 ns      9281088 ns            1 items_per_second=3.44843k/s producer_items_per_second=10.6184M
+Total tasks: 100000
+Completed tasks: 100000
+BM_TaskScheduling/MediumTask/100000/2/100000/6/real_time 14503868163 ns      9737568 ns            1 items_per_second=6.89471k/s producer_items_per_second=10.4083M
+Total tasks: 100000
+Completed tasks: 100000
+BM_TaskScheduling/MediumTask/100000/4/100000/6/real_time 7393233792 ns     11358336 ns            1 items_per_second=13.5259k/s producer_items_per_second=8.99023M
+Total tasks: 100000
+Completed tasks: 100000
+BM_TaskScheduling/MediumTask/100000/6/100000/6/real_time 5635335428 ns      8893824 ns            1 items_per_second=17.7452k/s producer_items_per_second=5.6956M
+Total tasks: 100000
+Completed tasks: 100000
+BM_TaskScheduling/MediumTask/100000/8/100000/6/real_time 5454577949 ns      9673344 ns            1 items_per_second=18.3332k/s producer_items_per_second=11.0759M
+Total tasks: 100000
+Completed tasks: 100000
+BM_TaskScheduling/MediumTask/100000/1/100000/8/real_time 28974717721 ns     11696160 ns            1 items_per_second=3.45128k/s producer_items_per_second=8.59702M
+Total tasks: 100000
+Completed tasks: 100000
+BM_TaskScheduling/MediumTask/100000/2/100000/8/real_time 14508379477 ns      9034944 ns            1 items_per_second=6.89257k/s producer_items_per_second=11.2017M
+Total tasks: 100000
+Completed tasks: 100000
+BM_TaskScheduling/MediumTask/100000/4/100000/8/real_time 7299099998 ns     11265888 ns            1 items_per_second=13.7003k/s producer_items_per_second=8.41791M
+Total tasks: 100000
+Completed tasks: 100000
+BM_TaskScheduling/MediumTask/100000/6/100000/8/real_time 5097628496 ns      8704320 ns            1 items_per_second=19.617k/s producer_items_per_second=11.3255M
+Total tasks: 100000
+Completed tasks: 100000
+BM_TaskScheduling/MediumTask/100000/8/100000/8/real_time 5826408626 ns     12899648 ns            1 items_per_second=17.1632k/s producer_items_per_second=8.04651M

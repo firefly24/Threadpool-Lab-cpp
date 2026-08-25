@@ -77,11 +77,14 @@ static void BM_TaskScheduling(benchmark::State& state, Task workload)
 	
 	std::cout << "Total tasks: " << total_tasks << std::endl;
 	std::cout << "Completed tasks: " << total_completed_tasks << std::endl;
-	std::cout << "Producer throughput: " 
-		<< ((double)total_tasks/producer_duration/1000.0) <<"k/s" << std::endl;
-	std::cout << "Producer duration: " << producer_duration << std::endl;
+	//std::cout << "Producer throughput: " 
+	//	<< ((double)total_tasks/producer_duration/1000.0) <<"k/s" << std::endl;
+	//std::cout << "Producer duration: " << producer_duration << std::endl;
+	
+	double producer_throughput = ((double)total_tasks/producer_duration); 
 	
 	state.SetItemsProcessed(total_completed_tasks);
+	state.counters["producer_items_per_second"] = producer_throughput;
 	
 }
 
