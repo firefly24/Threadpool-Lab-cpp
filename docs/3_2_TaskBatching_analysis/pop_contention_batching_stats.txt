@@ -1,0 +1,175 @@
+darshana@darshana-desktop:~/practice/Threadpool-lab-cpp$ ./run_bench --benchmark_filter='BM_TaskScheduling/SmallTask/100000/2/100000/6'
+2026-08-26T14:33:14+05:30
+Running ./run_bench
+Run on (6 X 1728 MHz CPU s)
+CPU Caches:
+  L1 Data 64 KiB (x6)
+  L1 Instruction 64 KiB (x6)
+  L2 Unified 256 KiB (x6)
+  L3 Unified 2048 KiB (x1)
+Load Average: 0.32, 0.36, 0.41
+***WARNING*** CPU scaling is enabled, the benchmark real time measurements may be noisy and will incur extra overhead.
+Total work consumed: 100000
+Push contention: 0
+Pop contention: 330
+Pop wait duration: 0.795813ms
+Total batching events: 16667
+Total tasks: 100000
+Completed tasks: 100000
+Total work consumed: 100000
+Push contention: 0
+Pop contention: 260
+Pop wait duration: 0.543317ms
+Total batching events: 16667
+Total work consumed: 100000
+Push contention: 0
+Pop contention: 212
+Pop wait duration: 0.488978ms
+Total batching events: 16667
+Total work consumed: 100000
+Push contention: 0
+Pop contention: 209
+Pop wait duration: 0.121317ms
+Total batching events: 16667
+Total work consumed: 100000
+Push contention: 0
+Pop contention: 303
+Pop wait duration: 0.714042ms
+Total batching events: 16667
+Total tasks: 400000
+Completed tasks: 400000
+------------------------------------------------------------------------------------------------------------------
+Benchmark                                                        Time             CPU   Iterations UserCounters...
+------------------------------------------------------------------------------------------------------------------
+BM_TaskScheduling/SmallTask/100000/2/100000/6/real_time  162641590 ns     10084520 ns            4 items_per_second=614.849k/s producer_items_per_second=9.64767M
+darshana@darshana-desktop:~/practice/Threadpool-lab-cpp$ ./run_bench --benchmark_filter='BM_TaskScheduling/SmallTask/100000/4/100000/6'
+2026-08-26T14:33:26+05:30
+Running ./run_bench
+Run on (6 X 1728 MHz CPU s)
+CPU Caches:
+  L1 Data 64 KiB (x6)
+  L1 Instruction 64 KiB (x6)
+  L2 Unified 256 KiB (x6)
+  L3 Unified 2048 KiB (x1)
+Load Average: 0.27, 0.34, 0.41
+***WARNING*** CPU scaling is enabled, the benchmark real time measurements may be noisy and will incur extra overhead.
+Total work consumed: 100000
+Push contention: 0
+Pop contention: 1877
+Pop wait duration: 7.06369ms
+Total batching events: 16667
+Total tasks: 100000
+Completed tasks: 100000
+Total work consumed: 100000
+Push contention: 0
+Pop contention: 1353
+Pop wait duration: 3.52466ms
+Total batching events: 16667
+Total work consumed: 100000
+Push contention: 0
+Pop contention: 1772
+Pop wait duration: 3.44519ms
+Total batching events: 16667
+Total work consumed: 100000
+Push contention: 0
+Pop contention: 1619
+Pop wait duration: 2.45754ms
+Total batching events: 16667
+Total work consumed: 100000
+Push contention: 0
+Pop contention: 1593
+Pop wait duration: 2.9826ms
+Total batching events: 16667
+Total work consumed: 100000
+Push contention: 0
+Pop contention: 1723
+Pop wait duration: 4.47886ms
+Total batching events: 16667
+Total work consumed: 100000
+Push contention: 0
+Pop contention: 1756
+Pop wait duration: 2.56399ms
+Total batching events: 16667
+Total work consumed: 100000
+Push contention: 0
+Pop contention: 2383
+Pop wait duration: 3.61058ms
+Total batching events: 16667
+Total tasks: 700000
+Completed tasks: 700000
+------------------------------------------------------------------------------------------------------------------
+Benchmark                                                        Time             CPU   Iterations UserCounters...
+------------------------------------------------------------------------------------------------------------------
+BM_TaskScheduling/SmallTask/100000/4/100000/6/real_time   99000838 ns     16617495 ns            7 items_per_second=1010.09k/s producer_items_per_second=4.98353M
+darshana@darshana-desktop:~/practice/Threadpool-lab-cpp$ ./run_bench --benchmark_filter='BM_TaskScheduling/SmallTask/100000/6/100000/6'
+2026-08-26T14:33:30+05:30
+Running ./run_bench
+Run on (6 X 1728 MHz CPU s)
+CPU Caches:
+  L1 Data 64 KiB (x6)
+  L1 Instruction 64 KiB (x6)
+  L2 Unified 256 KiB (x6)
+  L3 Unified 2048 KiB (x1)
+Load Average: 0.25, 0.34, 0.40
+***WARNING*** CPU scaling is enabled, the benchmark real time measurements may be noisy and will incur extra overhead.
+Total work consumed: 100000
+Push contention: 0
+Pop contention: 2366
+Pop wait duration: 26.2949ms
+Total batching events: 16667
+Total tasks: 100000
+Completed tasks: 100000
+Total work consumed: 100000
+Push contention: 0
+Pop contention: 2020
+Pop wait duration: 52.0388ms
+Total batching events: 16670
+Total work consumed: 100000
+Push contention: 0
+Pop contention: 2255
+Pop wait duration: 9.96725ms
+Total batching events: 16675
+Total work consumed: 100000
+Push contention: 0
+Pop contention: 3087
+Pop wait duration: 28.411ms
+Total batching events: 16667
+Total work consumed: 100000
+Push contention: 0
+Pop contention: 2935
+Pop wait duration: 20.5338ms
+Total batching events: 16667
+Total work consumed: 100000
+Push contention: 0
+Pop contention: 2763
+Pop wait duration: 13.6578ms
+Total batching events: 16667
+Total work consumed: 100000
+Push contention: 0
+Pop contention: 2932
+Pop wait duration: 26.1801ms
+Total batching events: 16672
+Total work consumed: 100000
+Push contention: 0
+Pop contention: 2411
+Pop wait duration: 9.19695ms
+Total batching events: 16667
+Total work consumed: 100000
+Push contention: 0
+Pop contention: 3647
+Pop wait duration: 46.4185ms
+Total batching events: 16727
+Total work consumed: 100000
+Push contention: 0
+Pop contention: 3213
+Pop wait duration: 13.4082ms
+Total batching events: 16671
+Total tasks: 900000
+Completed tasks: 900000
+------------------------------------------------------------------------------------------------------------------
+Benchmark                                                        Time             CPU   Iterations UserCounters...
+------------------------------------------------------------------------------------------------------------------
+BM_TaskScheduling/SmallTask/100000/6/100000/6/real_time   78160316 ns     25345020 ns            9 items_per_second=1.27942M/s producer_items_per_second=1.94751M
+darshana@darshana-desktop:~/practice/Threadpool-lab-cpp$ 
+
+

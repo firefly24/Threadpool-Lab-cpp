@@ -166,7 +166,7 @@ ThreadPool<Task>::~ThreadPool()
     
     /*
     std::cout << "ThreadPool stopped" << std::endl;
-	
+	*/
 	std::cout << "Total work consumed: " << completed_tasks.load(std::memory_order_relaxed) << std::endl;
 	
 	std::cout << "Push contention: " << task_queue_.push_stats.load(std::memory_order_relaxed) << std::endl;
@@ -175,7 +175,9 @@ ThreadPool<Task>::~ThreadPool()
 	double total_pop_wait_time = std::chrono::duration<double>(task_queue_.pop_contention_time).count();
 	
 	std::cout << "Pop wait duration: " << total_pop_wait_time *1000   << "ms" <<std::endl;
-	*/
+	
+	std::cout << "Total batching events: " << task_queue_.batches_count.load(std::memory_order_relaxed) << std::endl;
+	
 }
 
 
