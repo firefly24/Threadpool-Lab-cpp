@@ -36,7 +36,10 @@ test: $(NOTRACING_OBJ)
 	
 # Release build - for performance testing
 benchmark: $(NOTRACING_OBJ) 
-	$(CXX) $(CXXFLAGS) $(INCLUDES) $(BENCH_SRC) $(NOTRACING_OBJ) -o $(BENCH_TARGET) -lbenchmark -lpthread -g -O3 -DNDEBUG
+	$(CXX) $(CXXFLAGS) $(INCLUDES) $(BENCH_SRC) $(NOTRACING_OBJ) -o $(BENCH_TARGET) -lbenchmark -lpthread -g -O1 -fno-omit-frame-pointer -fno-inline -fsanitize=thread #-O3 -DNDEBUG 
+	
+benchmark-perf: $(NOTRACING_OBJ) 
+	$(CXX) $(CXXFLAGS) $(INCLUDES) $(BENCH_SRC) $(NOTRACING_OBJ) -o $(BENCH_TARGET) -lbenchmark -lpthread -g -O3 -DNDEBUG 
 	
 # For testing with custom traces enabled
 benchmark-traced: $(TRACING_OBJ) $(PERFETTO_OBJ)
