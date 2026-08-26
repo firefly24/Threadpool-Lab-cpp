@@ -1,0 +1,21 @@
+timestamp=2026-08-26_21-30-30
+git_commit=09caed2a38066541ed79b4e7218939db6a8d0036
+git_status:
+ M scripts/capture_trace.sh
+?? .gitignore
+?? artifacts/
+?? benchmark_results_2026-08-26_21-04-38.log
+?? query_latency.sql
+?? scripts/BENCH_2026-08-26_21-30-30/
+?? scripts/benchmark_results_2026-08-26_21-06-02.log
+?? scripts/benchmark_runner.sh
+?? scripts/visualize_batching.py
+
+system:
+Linux darshana-desktop 5.15.148-tegra #1 SMP PREEMPT Thu Sep 18 15:08:33 PDT 2025 aarch64 aarch64 aarch64 GNU/Linux
+
+compiler:
+g++-16 (Ubuntu 16-20260315-1ubuntu1~22~ppa1) 16.0.1 20260315 (experimental) [trunk r16-8100-g3aca3bae8ee]
+
+benchmark_binary=/home/darshana/practice/Threadpool-lab-cpp/run_bench
+benchmark_filter=BM_TaskScheduling/SmallTask
