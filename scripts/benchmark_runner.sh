@@ -5,7 +5,7 @@ set -euo pipefail
 SCRIPTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(dirname "$SCRIPTS_DIR")"
 
-BENCH="run_bench"
+BENCH="run_bench-perf"
 REPETITIONS=5
 
 if [ ! -x "$PROJECT_ROOT/$BENCH" ]; then
@@ -43,7 +43,7 @@ fi
 
 TIMESTAMP=$(date +"%Y-%m-%d_%H-%M-%S")
 
-RESULTS_DIR="$SCRIPTS_DIR/BENCH_${TIMESTAMP}"
+RESULTS_DIR="$SCRIPTS_DIR/results/BENCH_${TIMESTAMP}"
 
 mkdir -p "$RESULTS_DIR"
 

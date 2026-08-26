@@ -11,6 +11,7 @@ TEST_SRC := tests/test_basic.cpp
 
 BENCH_TARGET := run_bench
 BENCH_TARGET_TRACED := run_bench_traced
+BENCH_TARGET_PERF := run_bench-perf
 #BENCH_SRC := benchmarks/benchmark_threadpool.cpp
 BENCH_SRC := benchmarks/bm_benchmark.cpp
 
@@ -39,7 +40,7 @@ benchmark: $(NOTRACING_OBJ)
 	$(CXX) $(CXXFLAGS) $(INCLUDES) $(BENCH_SRC) $(NOTRACING_OBJ) -o $(BENCH_TARGET) -lbenchmark -lpthread -g -O1 -fno-omit-frame-pointer -fno-inline -fsanitize=thread #-O3 -DNDEBUG 
 	
 benchmark-perf: $(NOTRACING_OBJ) 
-	$(CXX) $(CXXFLAGS) $(INCLUDES) $(BENCH_SRC) $(NOTRACING_OBJ) -o $(BENCH_TARGET) -lbenchmark -lpthread -g -O3 -DNDEBUG 
+	$(CXX) $(CXXFLAGS) $(INCLUDES) $(BENCH_SRC) $(NOTRACING_OBJ) -o $(BENCH_TARGET_PERF) -lbenchmark -lpthread -g -O3 -DNDEBUG 
 	
 # For testing with custom traces enabled
 benchmark-traced: $(TRACING_OBJ) $(PERFETTO_OBJ)
