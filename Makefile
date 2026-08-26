@@ -37,7 +37,7 @@ test: $(NOTRACING_OBJ)
 	
 # Release build - for performance testing
 benchmark: $(NOTRACING_OBJ) 
-	$(CXX) $(CXXFLAGS) $(INCLUDES) $(BENCH_SRC) $(NOTRACING_OBJ) -o $(BENCH_TARGET) -lbenchmark -lpthread -g -O1 -fno-omit-frame-pointer -fno-inline -fsanitize=thread #-O3 -DNDEBUG 
+	$(CXX) $(CXXFLAGS) $(INCLUDES) $(BENCH_SRC) $(NOTRACING_OBJ) -o $(BENCH_TARGET) -lbenchmark -lpthread -g -O1 -fno-omit-frame-pointer -fno-inline #-fsanitize=thread -O3 -DNDEBUG 
 	
 benchmark-perf: $(NOTRACING_OBJ) 
 	$(CXX) $(CXXFLAGS) $(INCLUDES) $(BENCH_SRC) $(NOTRACING_OBJ) -o $(BENCH_TARGET_PERF) -lbenchmark -lpthread -g -O3 -DNDEBUG 
@@ -63,4 +63,4 @@ $(PERFETTO_OBJ): $(PERFETTO_SRC)
 
 # clean artifacts
 clean:
-	rm -f $(TARGET) $(TEST_TARGET) $(BENCH_TARGET) $(PERFETTO_OBJ)  $(TRACING_OBJ) $(NOTRACING_OBJ) $(BENCH_TARGET_TRACED)
+	rm -f $(TARGET) $(TEST_TARGET) $(BENCH_TARGET) $(PERFETTO_OBJ)  $(TRACING_OBJ) $(NOTRACING_OBJ) $(BENCH_TARGET_TRACED) $(BENCH_TARGET_PERF)

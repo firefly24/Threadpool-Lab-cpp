@@ -41,6 +41,14 @@ if [ "$#" -eq 2 ]; then
 	FILTER="BM_TaskScheduling/$WORKLOAD/100000/$WORKERS/100000"
 fi
 
+if [ "$#" -eq 3 ]; then
+	WORKLOAD=$1
+	WORKERS=$2
+	BATCH_SIZE=$3
+	echo "Running benchmark for workload: $WORKLOAD, with Workers: $WORKERS, batch:$BATCH_SIZE" >&2
+	FILTER="BM_TaskScheduling/$WORKLOAD/100000/$WORKERS/100000/$BATCH_SIZE"
+fi
+
 TIMESTAMP=$(date +"%Y-%m-%d_%H-%M-%S")
 
 RESULTS_DIR="$SCRIPTS_DIR/results/BENCH_${TIMESTAMP}"
@@ -77,4 +85,7 @@ METADATA_FILE="$RESULTS_DIR/metadata.txt"
     echo "benchmark_filter=$FILTER"
     #echo "benchmark_repetitions=$REPETITIONS"
 } > "$METADATA_FILE"
+
+#python3 "$SCRIPTS_DIR/visualize_batching.py" "$RESULTS_DIR/benchmark.log"
+
 

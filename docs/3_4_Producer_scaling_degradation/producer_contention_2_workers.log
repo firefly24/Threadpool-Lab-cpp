@@ -1,0 +1,34 @@
+Total work consumed: 100000
+Push contention: 617
+Pop contention: 419
+Push wait duration: 0.971966ms
+Pop wait duration: 2.60575ms
+Total batching events: 16667
+Total work consumed: 100000
+Push contention: 493
+Pop contention: 319
+Push wait duration: 0.444814ms
+Pop wait duration: 0.415723ms
+Total batching events: 16667
+Total work consumed: 100000
+Push contention: 418
+Pop contention: 125
+Push wait duration: 0.172647ms
+Pop wait duration: 0.34536ms
+Total batching events: 16667
+Total work consumed: 100000
+Push contention: 363
+Pop contention: 166
+Push wait duration: 0.133893ms
+Pop wait duration: 0.101256ms
+Total batching events: 16667
+Total work consumed: 100000
+Push contention: 449
+Pop contention: 193
+Push wait duration: 0.194792ms
+Pop wait duration: 0.387502ms
+Total batching events: 16667
+------------------------------------------------------------------------------------------------------------------
+Benchmark                                                        Time             CPU   Iterations UserCounters...
+------------------------------------------------------------------------------------------------------------------
+BM_TaskScheduling/SmallTask/100000/2/100000/6/real_time  176524471 ns      9940800 ns            4 Completed tasks=400k Rejected tasks=0 Total tasks=400k accepted tasks=400k items_per_second=566.494k/s producer_items_per_second=10.1332M

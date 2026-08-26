@@ -1,0 +1,58 @@
+Total work consumed: 100000
+Push contention: 1368
+Pop contention: 1858
+Push wait duration: 3.03407ms
+Pop wait duration: 10.4625ms
+Total batching events: 16667
+Total work consumed: 100000
+Push contention: 1250
+Pop contention: 1404
+Push wait duration: 3.15572ms
+Pop wait duration: 6.16891ms
+Total batching events: 16667
+Total work consumed: 100000
+Push contention: 2068
+Pop contention: 1923
+Push wait duration: 12.9569ms
+Pop wait duration: 8.47347ms
+Total batching events: 16667
+Total work consumed: 100000
+Push contention: 1857
+Pop contention: 2032
+Push wait duration: 11.3875ms
+Pop wait duration: 6.28421ms
+Total batching events: 16709
+Total work consumed: 100000
+Push contention: 1546
+Pop contention: 1607
+Push wait duration: 10.0462ms
+Pop wait duration: 2.36433ms
+Total batching events: 16667
+Total work consumed: 100000
+Push contention: 1702
+Pop contention: 1829
+Push wait duration: 2.94321ms
+Pop wait duration: 3.05538ms
+Total batching events: 16667
+Total work consumed: 100000
+Push contention: 1442
+Pop contention: 1512
+Push wait duration: 2.56229ms
+Pop wait duration: 3.05716ms
+Total batching events: 16667
+Total work consumed: 100000
+Push contention: 2328
+Pop contention: 2152
+Push wait duration: 3.93633ms
+Pop wait duration: 3.62435ms
+Total batching events: 16667
+Total work consumed: 100000
+Push contention: 1440
+Pop contention: 1688
+Push wait duration: 16.7827ms
+Pop wait duration: 8.53663ms
+Total batching events: 16667
+------------------------------------------------------------------------------------------------------------------
+Benchmark                                                        Time             CPU   Iterations UserCounters...
+------------------------------------------------------------------------------------------------------------------
+BM_TaskScheduling/SmallTask/100000/4/100000/6/real_time  101783668 ns     24830156 ns            8 Completed tasks=800k Rejected tasks=0 Total tasks=800k accepted tasks=800k items_per_second=982.476k/s producer_items_per_second=3.18999M

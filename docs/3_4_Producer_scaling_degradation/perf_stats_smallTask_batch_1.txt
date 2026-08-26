@@ -1,0 +1,218 @@
+darshana@darshana-desktop:~/practice/Threadpool-lab-cpp$ sudo $(which perf) stat -d -d ./run_bench-perf --benchmark_filter="BM_TaskScheduling/SmallTask/100000/1/100000/1"
+2026-08-27T00:52:01+05:30
+Running ./run_bench-perf
+Run on (6 X 1728 MHz CPU s)
+CPU Caches:
+  L1 Data 64 KiB (x6)
+  L1 Instruction 64 KiB (x6)
+  L2 Unified 256 KiB (x6)
+  L3 Unified 2048 KiB (x1)
+Load Average: 1.37, 0.96, 0.74
+***WARNING*** CPU scaling is enabled, the benchmark real time measurements may be noisy and will incur extra overhead.
+------------------------------------------------------------------------------------------------------------------
+Benchmark                                                        Time             CPU   Iterations UserCounters...
+------------------------------------------------------------------------------------------------------------------
+BM_TaskScheduling/SmallTask/100000/1/100000/1/real_time  308171434 ns      9724640 ns            2 Completed tasks=200k Rejected tasks=0 Total tasks=200k accepted tasks=200k items_per_second=324.495k/s producer_items_per_second=10.4041M
+
+ Performance counter stats for './run_bench-perf --benchmark_filter=BM_TaskScheduling/SmallTask/100000/1/100000/1':
+
+            952.20 msec task-clock                #    1.025 CPUs utilized          
+               438      context-switches          #  459.987 /sec                   
+                 0      cpu-migrations            #    0.000 /sec                   
+               956      page-faults               #    1.004 K/sec                  
+    1,58,19,38,698      cycles                    #    1.661 GHz                      (53.67%)
+    1,66,76,88,383      instructions              #    1.05  insn per cycle           (53.13%)
+   <not supported>      branches                                                    
+          4,44,742      branch-misses                                                 (53.62%)
+      66,31,19,933      L1-dcache-loads           #  696.408 M/sec                    (53.81%)
+          5,93,629      L1-dcache-load-misses     #    0.09% of all L1-dcache accesses  (53.70%)
+          8,85,604      LLC-loads                 #  930.061 K/sec                    (54.30%)
+          4,94,794      LLC-load-misses           #   55.87% of all LL-cache accesses  (56.09%)
+      32,90,64,376      L1-icache-loads           #  345.583 M/sec                    (48.31%)
+          1,13,294      L1-icache-load-misses     #    0.03% of all L1-icache accesses  (48.20%)
+      63,75,99,301      dTLB-loads                #  669.606 M/sec                    (47.37%)
+            38,843      dTLB-load-misses          #    0.01% of all dTLB cache accesses  (47.08%)
+         58,29,426      iTLB-loads                #    6.122 M/sec                    (47.30%)
+             3,821      iTLB-load-misses          #    0.07% of all iTLB cache accesses  (46.03%)
+
+       0.928888657 seconds time elapsed
+
+       0.924474000 seconds user
+       0.019723000 seconds sys
+
+
+darshana@darshana-desktop:~/practice/Threadpool-lab-cpp$ sudo $(which perf) stat -d -d ./run_bench-perf --benchmark_filter="BM_TaskScheduling/SmallTask/100000/2/100000/1"
+2026-08-27T00:52:06+05:30
+Running ./run_bench-perf
+Run on (6 X 1728 MHz CPU s)
+CPU Caches:
+  L1 Data 64 KiB (x6)
+  L1 Instruction 64 KiB (x6)
+  L2 Unified 256 KiB (x6)
+  L3 Unified 2048 KiB (x1)
+Load Average: 1.26, 0.95, 0.74
+***WARNING*** CPU scaling is enabled, the benchmark real time measurements may be noisy and will incur extra overhead.
+------------------------------------------------------------------------------------------------------------------
+Benchmark                                                        Time             CPU   Iterations UserCounters...
+------------------------------------------------------------------------------------------------------------------
+BM_TaskScheduling/SmallTask/100000/2/100000/1/real_time  197932749 ns     13557432 ns            4 Completed tasks=400k Rejected tasks=0 Total tasks=400k accepted tasks=400k items_per_second=505.222k/s producer_items_per_second=7.30917M
+
+ Performance counter stats for './run_bench-perf --benchmark_filter=BM_TaskScheduling/SmallTask/100000/2/100000/1':
+
+          1,993.06 msec task-clock                #    2.021 CPUs utilized          
+             1,905      context-switches          #  955.818 /sec                   
+                10      cpu-migrations            #    5.017 /sec                   
+               952      page-faults               #  477.658 /sec                   
+    3,17,76,65,974      cycles                    #    1.594 GHz                      (53.08%)
+    2,77,07,92,721      instructions              #    0.87  insn per cycle           (52.10%)
+   <not supported>      branches                                                    
+          8,40,049      branch-misses                                                 (52.10%)
+    1,11,80,96,774      L1-dcache-loads           #  560.996 M/sec                    (52.64%)
+         51,04,704      L1-dcache-load-misses     #    0.46% of all L1-dcache accesses  (55.14%)
+         60,07,281      LLC-loads                 #    3.014 M/sec                    (56.64%)
+         34,03,910      LLC-load-misses           #   56.66% of all LL-cache accesses  (56.42%)
+      59,72,52,255      L1-icache-loads           #  299.666 M/sec                    (49.32%)
+          9,34,725      L1-icache-load-misses     #    0.16% of all L1-icache accesses  (49.97%)
+    1,12,60,15,433      dTLB-loads                #  564.969 M/sec                    (49.08%)
+          1,99,554      dTLB-load-misses          #    0.02% of all dTLB cache accesses  (47.47%)
+       3,55,20,498      iTLB-loads                #   17.822 M/sec                    (46.21%)
+            50,080      iTLB-load-misses          #    0.14% of all iTLB cache accesses  (45.98%)
+
+       0.985936660 seconds time elapsed
+
+       1.942195000 seconds user
+       0.039157000 seconds sys
+
+
+darshana@darshana-desktop:~/practice/Threadpool-lab-cpp$ sudo $(which perf) stat -d -d ./run_bench-perf --benchmark_filter="BM_TaskScheduling/SmallTask/100000/4/100000/1"
+2026-08-27T00:52:11+05:30
+Running ./run_bench-perf
+Run on (6 X 1728 MHz CPU s)
+CPU Caches:
+  L1 Data 64 KiB (x6)
+  L1 Instruction 64 KiB (x6)
+  L2 Unified 256 KiB (x6)
+  L3 Unified 2048 KiB (x1)
+Load Average: 1.16, 0.93, 0.74
+***WARNING*** CPU scaling is enabled, the benchmark real time measurements may be noisy and will incur extra overhead.
+------------------------------------------------------------------------------------------------------------------
+Benchmark                                                        Time             CPU   Iterations UserCounters...
+------------------------------------------------------------------------------------------------------------------
+BM_TaskScheduling/SmallTask/100000/4/100000/1/real_time  152609050 ns     70132422 ns            5 Completed tasks=500k Rejected tasks=0 Total tasks=500k accepted tasks=500k items_per_second=655.269k/s producer_items_per_second=1.3008M
+
+ Performance counter stats for './run_bench-perf --benchmark_filter=BM_TaskScheduling/SmallTask/100000/4/100000/1':
+
+          3,742.56 msec task-clock                #    4.097 CPUs utilized          
+            29,970      context-switches          #    8.008 K/sec                  
+                46      cpu-migrations            #   12.291 /sec                   
+             1,650      page-faults               #  440.875 /sec                   
+    5,07,23,09,360      cycles                    #    1.355 GHz                      (52.96%)
+    4,04,52,07,435      instructions              #    0.80  insn per cycle           (52.24%)
+   <not supported>      branches                                                    
+         34,00,161      branch-misses                                                 (52.60%)
+    1,55,73,22,109      L1-dcache-loads           #  416.111 M/sec                    (54.34%)
+       1,25,33,571      L1-dcache-load-misses     #    0.80% of all L1-dcache accesses  (54.90%)
+       1,47,67,688      LLC-loads                 #    3.946 M/sec                    (55.82%)
+         61,51,754      LLC-load-misses           #   41.66% of all LL-cache accesses  (57.00%)
+      99,56,33,216      L1-icache-loads           #  266.030 M/sec                    (49.75%)
+         72,21,762      L1-icache-load-misses     #    0.73% of all L1-icache accesses  (49.73%)
+    1,58,94,56,506      dTLB-loads                #  424.697 M/sec                    (48.35%)
+         21,64,766      dTLB-load-misses          #    0.14% of all dTLB cache accesses  (48.21%)
+      36,84,85,976      iTLB-loads                #   98.458 M/sec                    (47.02%)
+          5,78,795      iTLB-load-misses          #    0.16% of all iTLB cache accesses  (45.92%)
+
+       0.913534343 seconds time elapsed
+
+       3.143433000 seconds user
+       0.633168000 seconds sys
+
+
+darshana@darshana-desktop:~/practice/Threadpool-lab-cpp$ sudo $(which perf) stat -d -d ./run_bench-perf --benchmark_filter="BM_TaskScheduling/SmallTask/100000/6/100000/1"
+2026-08-27T00:52:16+05:30
+Running ./run_bench-perf
+Run on (6 X 1728 MHz CPU s)
+CPU Caches:
+  L1 Data 64 KiB (x6)
+  L1 Instruction 64 KiB (x6)
+  L2 Unified 256 KiB (x6)
+  L3 Unified 2048 KiB (x1)
+Load Average: 1.07, 0.92, 0.73
+***WARNING*** CPU scaling is enabled, the benchmark real time measurements may be noisy and will incur extra overhead.
+------------------------------------------------------------------------------------------------------------------
+Benchmark                                                        Time             CPU   Iterations UserCounters...
+------------------------------------------------------------------------------------------------------------------
+BM_TaskScheduling/SmallTask/100000/6/100000/1/real_time  154895412 ns    103780779 ns            6 Completed tasks=600k Rejected tasks=0 Total tasks=600k accepted tasks=600k items_per_second=645.597k/s producer_items_per_second=706.745k
+
+ Performance counter stats for './run_bench-perf --benchmark_filter=BM_TaskScheduling/SmallTask/100000/6/100000/1':
+
+          5,466.26 msec task-clock                #    5.143 CPUs utilized          
+          1,80,222      context-switches          #   32.970 K/sec                  
+               545      cpu-migrations            #   99.702 /sec                   
+               733      page-faults               #  134.095 /sec                   
+    7,85,88,26,698      cycles                    #    1.438 GHz                      (55.65%)
+    6,73,95,69,451      instructions              #    0.86  insn per cycle           (54.76%)
+   <not supported>      branches                                                    
+         64,58,704      branch-misses                                                 (54.17%)
+    2,54,97,80,074      L1-dcache-loads           #  466.458 M/sec                    (55.26%)
+       2,05,51,884      L1-dcache-load-misses     #    0.81% of all L1-dcache accesses  (55.86%)
+       2,48,48,468      LLC-loads                 #    4.546 M/sec                    (56.46%)
+         98,65,099      LLC-load-misses           #   39.70% of all LL-cache accesses  (56.41%)
+    1,85,47,83,733      L1-icache-loads           #  339.315 M/sec                    (48.70%)
+       1,94,50,999      L1-icache-load-misses     #    1.05% of all L1-icache accesses  (49.14%)
+    2,47,05,48,306      dTLB-loads                #  451.963 M/sec                    (47.98%)
+         60,99,117      dTLB-load-misses          #    0.25% of all dTLB cache accesses  (47.75%)
+    1,08,84,32,780      iTLB-loads                #  199.118 M/sec                    (47.04%)
+         11,97,409      iTLB-load-misses          #    0.11% of all iTLB cache accesses  (47.83%)
+
+       1.062912008 seconds time elapsed
+
+       3.790158000 seconds user
+       1.744721000 seconds sys
+
+
+darshana@darshana-desktop:~/practice/Threadpool-lab-cpp$ sudo $(which perf) stat -d -d ./run_bench-perf --benchmark_filter="BM_TaskScheduling/SmallTask/100000/8/100000/1"
+2026-08-27T00:52:21+05:30
+Running ./run_bench-perf
+Run on (6 X 1728 MHz CPU s)
+CPU Caches:
+  L1 Data 64 KiB (x6)
+  L1 Instruction 64 KiB (x6)
+  L2 Unified 256 KiB (x6)
+  L3 Unified 2048 KiB (x1)
+Load Average: 0.98, 0.90, 0.73
+***WARNING*** CPU scaling is enabled, the benchmark real time measurements may be noisy and will incur extra overhead.
+------------------------------------------------------------------------------------------------------------------
+Benchmark                                                        Time             CPU   Iterations UserCounters...
+------------------------------------------------------------------------------------------------------------------
+BM_TaskScheduling/SmallTask/100000/8/100000/1/real_time  205715253 ns    141612840 ns            4 Completed tasks=400k Rejected tasks=0 Total tasks=400k accepted tasks=400k items_per_second=486.109k/s producer_items_per_second=488.434k
+
+ Performance counter stats for './run_bench-perf --benchmark_filter=BM_TaskScheduling/SmallTask/100000/8/100000/1':
+
+          5,267.68 msec task-clock                #    5.190 CPUs utilized          
+          7,24,321      context-switches          #  137.503 K/sec                  
+             1,792      cpu-migrations            #  340.188 /sec                   
+               296      page-faults               #   56.192 /sec                   
+    8,31,56,29,727      cycles                    #    1.579 GHz                      (54.53%)
+    9,33,87,40,941      instructions              #    1.12  insn per cycle           (53.96%)
+   <not supported>      branches                                                    
+         74,54,128      branch-misses                                                 (54.36%)
+    3,10,84,09,000      L1-dcache-loads           #  590.091 M/sec                    (55.24%)
+       2,29,15,799      L1-dcache-load-misses     #    0.74% of all L1-dcache accesses  (56.88%)
+       2,66,43,661      LLC-loads                 #    5.058 M/sec                    (56.68%)
+         91,14,545      LLC-load-misses           #   34.21% of all LL-cache accesses  (56.59%)
+    2,41,07,33,830      L1-icache-loads           #  457.646 M/sec                    (49.03%)
+       3,02,18,054      L1-icache-load-misses     #    1.25% of all L1-icache accesses  (49.33%)
+    3,06,98,96,849      dTLB-loads                #  582.780 M/sec                    (48.25%)
+       1,82,01,125      dTLB-load-misses          #    0.59% of all dTLB cache accesses  (46.52%)
+    2,09,25,00,271      iTLB-loads                #  397.234 M/sec                    (46.97%)
+         10,95,934      iTLB-load-misses          #    0.05% of all iTLB cache accesses  (47.36%)
+
+       1.014906558 seconds time elapsed
+
+       2.806051000 seconds user
+       2.517070000 seconds sys
+
+
+darshana@darshana-desktop:~/practice/Threadpool-lab-cpp$ 
+
+

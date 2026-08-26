@@ -105,7 +105,7 @@ BENCHMARK_CAPTURE( BM_TaskScheduling,	// benchmarking function
 					Task(emptyTask)		// Workload for benchmarking
 				)->ArgsProduct({
 								{100000},
-								{1,2,3,4,5,6,8},
+								{1,2,4,6,8},
 								{100000},
 								{1,2,4,6,8}
 							   })->UseRealTime();
@@ -115,7 +115,7 @@ BENCHMARK_CAPTURE( BM_TaskScheduling,	// benchmarking function
 					Task(smallTask)		// Workload for benchmarking
 				)->ArgsProduct({
 								{100000},
-								{1,2,3,4,5,6,8},
+								{1,2,4,6,8},
 								{100000},
 								{1,2,4,6,8}
 							   })->UseRealTime();
