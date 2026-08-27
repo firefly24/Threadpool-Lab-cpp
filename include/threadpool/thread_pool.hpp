@@ -25,7 +25,7 @@ private:
     std::size_t max_workers_;
     std::size_t task_batch_size_;
     std::counting_semaphore<INT_MAX> work_items_;
-    std::atomic<unsigned int> completed_tasks_;
+    //std::atomic<unsigned int> completed_tasks_;
     std::atomic<bool> stop_requested_;
     std::atomic<bool> threadpool_stopped_;
      
@@ -54,7 +54,9 @@ public:
 
     unsigned int completedTaskCount()
     {
-        return completed_tasks_.load(std::memory_order_relaxed);
+        //return completed_tasks_.load(std::memory_order_relaxed);
+        
+       	return 0;
     }
     
     // lvalue overload- for Fire and forget tasks with no return value
@@ -80,7 +82,7 @@ ThreadPool<Task>::ThreadPool(std::size_t task_capacity, std::size_t max_worker,s
 					max_workers_(max_worker),  
 					task_batch_size_(batch_size),
 					work_items_(0),
-					completed_tasks_(0),
+					//completed_tasks_(0),
 					stop_requested_(false),
 					threadpool_stopped_(false)				
 {
@@ -149,20 +151,35 @@ void ThreadPool<Task>::stopPool()
 	}
 	
 	threadpool_stopped_.store(true,std::memory_order_release);
-	
+
+/*	
 	    std::cout << "Total work consumed: " << completed_tasks_.load(std::memory_order_relaxed) << std::endl;
 	
-	std::cout << "Push contention: " << task_queue_.push_stats.load(std::memory_order_relaxed) << std::endl;
-	std::cout << "Pop contention: " << task_queue_.pop_stats.load(std::memory_order_relaxed) << std::endl;
+	std::cout << "Push contention: " 
+			<< task_queue_.push_stats.load(std::memory_order_relaxed) << std::endl;
+	
+	std::cout << "Pop contention: " 
+			<< task_queue_.pop_stats.load(std::memory_order_relaxed) << std::endl;
 
-	double total_pop_wait_time = std::chrono::duration<double>(task_queue_.pop_contention_time).count();
+	double total_pop_wait_time =
+			std::chrono::duration<double>(task_queue_.pop_contention_time).count();
 	
-	double total_push_wait_time = std::chrono::duration<double>(task_queue_.push_contention_time).count();
+	double total_push_wait_time =
+			std::chrono::duration<double>(task_queue_.push_contention_time).count();
 	
-	std::cout << "Push wait duration: " << total_push_wait_time *1000   << "ms" <<std::endl;
-	std::cout << "Pop wait duration: " << total_pop_wait_time *1000   << "ms" <<std::endl;
+	std::cout << "Push wait duration: " 
+			<< total_push_wait_time *1000   
+			<< "ms" <<std::endl;
+			
+	std::cout << "Pop wait duration: " 
+			<< total_pop_wait_time *1000   
+			<< "ms" <<std::endl;
 	
-	std::cout << "Total batching events: " << task_queue_.batches_count.load(std::memory_order_relaxed) << std::endl;
+	std::cout << "Total batching events: " 
+			<< task_queue_.batches_count.load(std::memory_order_relaxed) 
+			<< std::endl;
+	
+	*/
 }
 
 
@@ -217,7 +234,7 @@ void ThreadPool<Task>::startWorkerThread() noexcept
             std::cerr << "Task thown exception" << std::endl;
         }
         // Notify that a task has been completed
-        completed_tasks_.fetch_add(1,std::memory_order_relaxed);
+        //completed_tasks_.fetch_add(1,std::memory_order_relaxed);
     }
     
 stop_worker:
@@ -275,7 +292,7 @@ void ThreadPool<Task>::startWorkerThreadBatched() noexcept
 		}
 		
 		// Update completed task count
-        completed_tasks_.fetch_add(pulled_work,std::memory_order_relaxed);
+       // completed_tasks_.fetch_add(pulled_work,std::memory_order_relaxed);
 		
 		// return only if pool is stopped and all tasks are completed
 		if (stop_requested_.load(std::memory_order_acquire))

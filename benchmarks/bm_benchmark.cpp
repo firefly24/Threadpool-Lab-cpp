@@ -81,8 +81,11 @@ static void BM_TaskScheduling(benchmark::State& state, Task workload)
 		total_tasks += num_tasks;
 		
 		// Update benchmark of completed tasks
-		completed_tasks += thread_pool.completedTaskCount();
+		//completed_tasks += thread_pool.completedTaskCount();
 	}
+	
+	// For experiment 3.4, we temporarily disabling atomic task ctr for threadpool
+	completed_tasks = total_tasks;
 	
 	double producer_duration = std::chrono::duration<double>(total_producer_time).count();
 

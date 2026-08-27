@@ -37,9 +37,7 @@ mkdir -p "$RESULTS_DIR"
 echo "Benchmark results will be captured in $RESULTS_DIR "
 
 sudo "$PERF_BIN" stat \
-    -x, \
-    -d \
-    -o "$RESULTS_DIR/perf_stat.csv" \
+    -d -d \
     "$PROJECT_ROOT/$BENCH" \
     --benchmark_filter="$FILTER" \
     --benchmark_repetitions=1 \
