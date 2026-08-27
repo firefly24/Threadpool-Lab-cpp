@@ -52,7 +52,7 @@ static void BM_TaskScheduling(benchmark::State& state, Task workload)
 	// ideally dropped ==0 once task submitted successfully
 	
 	std::chrono::nanoseconds total_producer_time{0};
-		
+	std::chrono::nanoseconds total_consumer_time{0};
 	
 	
 	for (auto _ : state)
@@ -72,29 +72,39 @@ static void BM_TaskScheduling(benchmark::State& state, Task workload)
 		}
 		auto producer_end = std::chrono::steady_clock::now();
 		
+		auto consumer_start = std::chrono::steady_clock::now();
+		// start workers 
+		thread_pool.launchWorkers();
+		
 		// destroy threadpool
 		thread_pool.stopPool();
+		
+		auto consumer_end = std::chrono::steady_clock::now();
 		
 		// Calculate total producer time taken to submit tasks
 		total_producer_time += std::chrono::duration_cast<std::chrono::nanoseconds>(producer_end-producer_start);
 		
+		// Calculate total consumer time taken to complete tasks
+		total_consumer_time +=
+		 std::chrono::duration_cast<std::chrono::nanoseconds>(consumer_end-consumer_start);
+		
 		total_tasks += num_tasks;
 		
 		// Update benchmark of completed tasks
-		//completed_tasks += thread_pool.completedTaskCount();
+		completed_tasks += thread_pool.completedTaskCount();
 	}
 	
-	// For experiment 3.4, we temporarily disabling atomic task ctr for threadpool
-	completed_tasks = total_tasks;
-	
 	double producer_duration = std::chrono::duration<double>(total_producer_time).count();
+	double consumer_duration = std::chrono::duration<double>(total_consumer_time).count();
 
 	accepted_tasks = total_tasks - rejected_tasks;
 	
 	double producer_throughput = ((double)accepted_tasks/producer_duration); 
+	double consumer_throughput = (static_cast<double>(completed_tasks)/consumer_duration); 
 	
 	state.SetItemsProcessed(completed_tasks);
 	state.counters["producer_items_per_second"] = producer_throughput;
+	state.counters["consumer_items_per_second"] = consumer_throughput;
 	state.counters["Total tasks"] = total_tasks;
 	
 	state.counters["accepted tasks"] = accepted_tasks;

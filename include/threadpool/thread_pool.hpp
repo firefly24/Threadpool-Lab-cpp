@@ -15,6 +15,11 @@
 #include "queue/concurrent_queue.hpp"
 #include "./instrumentation/tracing.hpp"
 
+static constexpr std::size_t CREATED = 0;
+static constexpr std::size_t RUNNING = 1;
+static constexpr std::size_t STOPPED = 2;
+//static constexpr std::size_t created = 0;
+
 template <typename Task>
 class ThreadPool
 {
@@ -25,14 +30,13 @@ private:
     std::size_t max_workers_;
     std::size_t task_batch_size_;
     std::counting_semaphore<INT_MAX> work_items_;
-    //std::atomic<unsigned int> completed_tasks_;
+    std::atomic<unsigned int> completed_tasks_;
     std::atomic<bool> stop_requested_;
     std::atomic<bool> threadpool_stopped_;
+    std::atomic<std::size_t> pool_state_;
      
     std::vector<std::thread> worker_threads_;
    
-    
-
     // Disable copying
     ThreadPool(const ThreadPool &) = delete;
     ThreadPool &operator=(const ThreadPool &) = delete;
@@ -49,15 +53,16 @@ private:
 
 public:
 
-	// lauch threadpool, if batch size not provided, keep default 1 task per pop behavior
+	// initialize threadpool, if batch size not provided, keep default 1 task per pop behavior
 	explicit ThreadPool(std::size_t task_capacity, std::size_t max_workers, std::size_t batch_size =1);
 
     unsigned int completedTaskCount()
     {
-        //return completed_tasks_.load(std::memory_order_relaxed);
-        
-       	return 0;
+        return completed_tasks_.load(std::memory_order_relaxed);
     }
+    
+    // External interface to Launch all worker threads manually, can be launched only once in a threadpool object lifetime
+    bool launchWorkers();
     
     // lvalue overload- for Fire and forget tasks with no return value
     bool taskSubmit(Task& task);
@@ -82,12 +87,24 @@ ThreadPool<Task>::ThreadPool(std::size_t task_capacity, std::size_t max_worker,s
 					max_workers_(max_worker),  
 					task_batch_size_(batch_size),
 					work_items_(0),
-					//completed_tasks_(0),
+					completed_tasks_(0),
 					stop_requested_(false),
-					threadpool_stopped_(false)				
+					threadpool_stopped_(false),
+					pool_state_(CREATED)			
 {
+	//launchWorkers();
+}
+
+
+template<typename Task>
+bool ThreadPool<Task>::launchWorkers()
+{
+	std::size_t expected = CREATED;
+	if (!pool_state_.compare_exchange_strong(expected,RUNNING,std::memory_order_seq_cst))
+			return false;
+		
     // Initialize worker threads
-    for (size_t worker = 0; worker < max_workers_; worker++)
+    for (size_t worker = 0; worker < max_workers_; worker++) {
         worker_threads_.emplace_back([this,worker]() 
         	{ 
         		std::string worker_name = "TPWorker-"+ std::to_string(worker);
@@ -99,6 +116,9 @@ ThreadPool<Task>::ThreadPool(std::size_t task_capacity, std::size_t max_worker,s
         			this->startWorkerThread();
         	}
         ); 
+	}
+	
+	return true;
 }
 
 
@@ -139,18 +159,26 @@ void ThreadPool<Task>::stopPool()
 	// notify threadpool to stop accepting new work
 	stop_requested_.store(true, std::memory_order_release);
 	
-	// Notify all worker threads to wake up and return now as queue is empty
-	for (std::size_t worker=0; worker<max_workers_; worker++)
-		work_items_.release();
-		
-	// Join all worker threads
-	for (auto &worker : worker_threads_)
+	if (pool_state_.load(std::memory_order_acquire) == RUNNING)
 	{
-		if (worker.joinable())
-			worker.join();
-	}
+		
+		// Notify all worker threads to wake up and return now as queue is empty
+		for (std::size_t worker=0; worker<max_workers_; worker++)
+			work_items_.release();
+			
+		// Join all worker threads
+		for (auto &worker : worker_threads_)
+		{
+			if (worker.joinable())
+				worker.join();
+		}
+	}	
 	
 	threadpool_stopped_.store(true,std::memory_order_release);
+	
+	pool_state_.store(STOPPED,std::memory_order_release);
+	
+	
 
 /*	
 	    std::cout << "Total work consumed: " << completed_tasks_.load(std::memory_order_relaxed) << std::endl;
@@ -234,7 +262,7 @@ void ThreadPool<Task>::startWorkerThread() noexcept
             std::cerr << "Task thown exception" << std::endl;
         }
         // Notify that a task has been completed
-        //completed_tasks_.fetch_add(1,std::memory_order_relaxed);
+        completed_tasks_.fetch_add(1,std::memory_order_relaxed);
     }
     
 stop_worker:
@@ -292,7 +320,7 @@ void ThreadPool<Task>::startWorkerThreadBatched() noexcept
 		}
 		
 		// Update completed task count
-       // completed_tasks_.fetch_add(pulled_work,std::memory_order_relaxed);
+        completed_tasks_.fetch_add(pulled_work,std::memory_order_relaxed);
 		
 		// return only if pool is stopped and all tasks are completed
 		if (stop_requested_.load(std::memory_order_acquire))

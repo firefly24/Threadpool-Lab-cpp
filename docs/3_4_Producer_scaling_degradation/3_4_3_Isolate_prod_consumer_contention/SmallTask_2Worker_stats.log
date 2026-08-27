@@ -1,0 +1,42 @@
+2026-08-27T19:49:25+05:30
+Running /home/darshana/practice/Threadpool-lab-cpp/run_bench-perf
+Run on (6 X 1728 MHz CPU s)
+CPU Caches:
+  L1 Data 64 KiB (x6)
+  L1 Instruction 64 KiB (x6)
+  L2 Unified 256 KiB (x6)
+  L3 Unified 2048 KiB (x1)
+Load Average: 1.23, 0.79, 0.57
+***WARNING*** CPU scaling is enabled, the benchmark real time measurements may be noisy and will incur extra overhead.
+------------------------------------------------------------------------------------------------------------------
+Benchmark                                                        Time             CPU   Iterations UserCounters...
+------------------------------------------------------------------------------------------------------------------
+BM_TaskScheduling/SmallTask/100000/2/100000/6/real_time  174722693 ns      9804696 ns            4 Completed tasks=400k Rejected tasks=0 Total tasks=400k accepted tasks=400k consumer_items_per_second=605.388k items_per_second=572.336k/s producer_items_per_second=10.4895M
+
+ Performance counter stats for '/home/darshana/practice/Threadpool-lab-cpp/run_bench-perf --benchmark_filter=BM_TaskScheduling/SmallTask/100000/2/100000/6 --benchmark_repetitions=1':
+
+          1,686.88 msec task-clock                #    1.931 CPUs utilized          
+                92      context-switches          #   54.539 /sec                   
+                 3      cpu-migrations            #    1.778 /sec                   
+               968      page-faults               #  573.840 /sec                   
+    2,64,95,30,448      cycles                    #    1.571 GHz                      (55.87%)
+    2,62,10,66,480      instructions              #    0.99  insn per cycle           (54.79%)
+   <not supported>      branches                                                    
+          7,34,460      branch-misses                                                 (55.09%)
+    1,04,61,02,778      L1-dcache-loads           #  620.140 M/sec                    (54.63%)
+         16,03,074      L1-dcache-load-misses     #    0.15% of all L1-dcache accesses  (54.96%)
+         23,25,793      LLC-loads                 #    1.379 M/sec                    (54.45%)
+         19,04,407      LLC-load-misses           #   81.88% of all LL-cache accesses  (54.65%)
+      53,99,99,458      L1-icache-loads           #  320.117 M/sec                    (47.00%)
+          2,80,883      L1-icache-load-misses     #    0.05% of all L1-icache accesses  (48.20%)
+    1,04,44,31,159      dTLB-loads                #  619.149 M/sec                    (47.79%)
+            79,347      dTLB-load-misses          #    0.01% of all dTLB cache accesses  (48.38%)
+       1,46,57,228      iTLB-loads                #    8.689 M/sec                    (48.62%)
+            19,955      iTLB-load-misses          #    0.14% of all iTLB cache accesses  (48.48%)
+
+       0.873617311 seconds time elapsed
+
+       1.649899000 seconds user
+       0.015773000 seconds sys
+
+
