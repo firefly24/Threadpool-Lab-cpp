@@ -14,12 +14,11 @@
 
 //#include "queue/concurrent_queue.hpp"
 #include "./instrumentation/tracing.hpp"
-#include "queue/spmc_queue.hpp"
+#include "queue/SPMC_locked/spmc_queue.hpp"
 
 static constexpr std::size_t CREATED = 0;
 static constexpr std::size_t RUNNING = 1;
 static constexpr std::size_t STOPPED = 2;
-//static constexpr std::size_t created = 0;
 
 template <typename Task>
 class ThreadPool
@@ -180,37 +179,6 @@ void ThreadPool<Task>::stopPool()
 	threadpool_stopped_.store(true,std::memory_order_release);
 	
 	pool_state_.store(STOPPED,std::memory_order_release);
-	
-	
-
-	
-	    std::cout << "Total work consumed: " << completed_tasks_.load(std::memory_order_relaxed) << std::endl;
-	
-//	std::cout << "Push contention: " 
-//			<< task_queue_.push_stats.load(std::memory_order_relaxed) << std::endl;
-/*	
-	std::cout << "Pop contention: " 
-			<< task_queue_.pop_stats.load(std::memory_order_relaxed) << std::endl;
-
-	double total_pop_wait_time =
-			std::chrono::duration<double>(task_queue_.pop_contention_time).count();
-*/	
-//	double total_push_wait_time =
-//			std::chrono::duration<double>(task_queue_.push_contention_time).count();
-	
-//	std::cout << "Push wait duration: " 
-//			<< total_push_wait_time *1000   
-//			<< "ms" <<std::endl;
-
-/*			
-	std::cout << "Pop wait duration: " 
-			<< total_pop_wait_time *1000   
-			<< "ms" <<std::endl;
-	
-	std::cout << "Total batching events: " 
-			<< task_queue_.batches_count.load(std::memory_order_relaxed) 
-			<< std::endl;
-*/	
 	
 }
 

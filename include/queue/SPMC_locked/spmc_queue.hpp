@@ -5,6 +5,8 @@
 #include <mutex>
 #include <utility>
 
+
+// define cache line padded atomic  indexes tp avoid false sharing impact
 struct alignas(64) padded_cacheline_var{
     std::atomic<std::size_t> index;
     padded_cacheline_var(std::size_t idx): index(idx){}    
@@ -52,10 +54,6 @@ public:
     std::size_t tryPopBatch(std::vector<T>& out, std::size_t batch_size);
 
     bool empty() const;
-    
-	//std::size_t capacity() const;
-    //std::size_t size() const;
-    //bool full() const;
 };
 
 
@@ -167,20 +165,4 @@ bool SPMCQueueLocked<T>::empty() const
     		== tail.index.load(std::memory_order_acquire));
 }
 
-/*
-size_t capacity() const
-{
-    return (capacity_ -1);
-}
-
-size_t size() const
-{
-    return((capacity_+tail.index.load(std::memory_order_relaxed)) - head.index.load(std::memory_order_relaxed) )%capacity_;
-}
-
-bool full() const {
-    size_t next = advance(tail.load(std::memory_order_acquire));
-    return next == head.load(std::memory_order_acquire);
-}
-*/
 
