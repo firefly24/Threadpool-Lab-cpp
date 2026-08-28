@@ -23,13 +23,12 @@ private:
 public:
 
     //for debug purpose only
-    /*
-   	std::atomic<unsigned int> push_stats;
+   	//std::atomic<unsigned int> push_stats;
  	std::atomic<unsigned int> pop_stats;
     std::chrono::nanoseconds pop_contention_time{0};
-    std::chrono::nanoseconds push_contention_time{0};
+    //std::chrono::nanoseconds push_contention_time{0};
     std::atomic<unsigned int> batches_count;
-    */
+   
     
 	explicit ConcurrentQueue(std::size_t capacity = DEFAULT_Q_CAPACITY);
 	
@@ -59,11 +58,11 @@ public:
 };
 
 template<typename T>
-ConcurrentQueue<T>::ConcurrentQueue(std::size_t capacity): capacity_(capacity)/*,
+ConcurrentQueue<T>::ConcurrentQueue(std::size_t capacity): capacity_(capacity),
 														// for diag
-														push_stats(0), pop_stats(0),
+														//push_stats(0), 
+														pop_stats(0),
 														batches_count(0)
-														*/
 {	
 	/*
 		Let queue capacity =0 be valid for now , we may need it for correctness and other diagnostic experiments
@@ -130,7 +129,7 @@ bool ConcurrentQueue<T>::tryPush(T&& item)
 template<typename T>
 bool ConcurrentQueue<T>::tryPop(T& item)
 {
-	/*
+	
 	//************* diagnostics start *************************
 	if (!mtx_.try_lock())
 	{
@@ -144,9 +143,9 @@ bool ConcurrentQueue<T>::tryPop(T& item)
 	std::lock_guard<std::mutex> lock(mtx_,std::adopt_lock);
 	
 	//-------------- diagnostics end *-----------------------
-	*/
 	
-	std::lock_guard<std::mutex> lock(mtx_);
+	
+	//std::lock_guard<std::mutex> lock(mtx_);
 	
 	if (!queue_.empty())
 	{
@@ -166,7 +165,7 @@ std::size_t  ConcurrentQueue<T>::tryPopBatch(std::vector<T>& items,std::size_t b
 	if (!batch_size)
 		return 0 ;
 	
-	/*
+	
 	//************* diagnostics start *************************	
 	batches_count.fetch_add(1, std::memory_order_relaxed);
 	
@@ -181,9 +180,9 @@ std::size_t  ConcurrentQueue<T>::tryPopBatch(std::vector<T>& items,std::size_t b
 	}
 	std::lock_guard<std::mutex> lock(mtx_,std::adopt_lock);
 	//-------------- diagnostics end *-----------------------
-	*/
 	
-	std::lock_guard<std::mutex> lock(mtx_);
+	
+	//std::lock_guard<std::mutex> lock(mtx_);
 	
 	while(!queue_.empty() && (work_popped_count < batch_size) )
 	{

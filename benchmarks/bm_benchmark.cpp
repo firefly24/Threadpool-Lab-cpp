@@ -60,6 +60,10 @@ static void BM_TaskScheduling(benchmark::State& state, Task workload)
 		// Construct threadpool
 		ThreadPool<Task> thread_pool(queue_size,num_workers,batch_size);
 		
+		// start workers 
+		thread_pool.launchWorkers();
+		auto consumer_start = std::chrono::steady_clock::now();
+		
 		auto producer_start = std::chrono::steady_clock::now();
 		{
 			TP_TRACE_EVENT("ProducerBatchSubmit");
@@ -72,9 +76,7 @@ static void BM_TaskScheduling(benchmark::State& state, Task workload)
 		}
 		auto producer_end = std::chrono::steady_clock::now();
 		
-		auto consumer_start = std::chrono::steady_clock::now();
-		// start workers 
-		thread_pool.launchWorkers();
+
 		
 		// destroy threadpool
 		thread_pool.stopPool();
