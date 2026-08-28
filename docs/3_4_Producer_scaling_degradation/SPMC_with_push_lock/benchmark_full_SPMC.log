@@ -1,0 +1,733 @@
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+-------------------------------------------------------------------------------------------------------------------
+Benchmark                                                         Time             CPU   Iterations UserCounters...
+-------------------------------------------------------------------------------------------------------------------
+BM_TaskScheduling/EmptyTask/100000/1/100000/1/real_time    51602605 ns     41964981 ns           14 Completed tasks=1.4M Rejected tasks=0 Total tasks=1.4M accepted tasks=1.4M consumer_items_per_second=1.95599M items_per_second=1.93789M/s producer_items_per_second=2.41048M
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+BM_TaskScheduling/EmptyTask/100000/2/100000/1/real_time    83414773 ns     56291246 ns            9 Completed tasks=900k Rejected tasks=0 Total tasks=900k accepted tasks=900k consumer_items_per_second=1.20646M items_per_second=1.19883M/s producer_items_per_second=1.79372M
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+BM_TaskScheduling/EmptyTask/100000/4/100000/1/real_time    94396319 ns     41521684 ns            8 Completed tasks=800k Rejected tasks=0 Total tasks=800k accepted tasks=800k consumer_items_per_second=1065.79k items_per_second=1059.36k/s producer_items_per_second=2.42514M
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+BM_TaskScheduling/EmptyTask/100000/6/100000/1/real_time    97256299 ns     26642964 ns            8 Completed tasks=800k Rejected tasks=0 Total tasks=800k accepted tasks=800k consumer_items_per_second=1037.02k items_per_second=1028.21k/s producer_items_per_second=3.75543M
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+BM_TaskScheduling/EmptyTask/100000/8/100000/1/real_time    90937334 ns     26258984 ns            8 Completed tasks=800k Rejected tasks=0 Total tasks=800k accepted tasks=800k consumer_items_per_second=1.11279M items_per_second=1099.66k/s producer_items_per_second=3.63968M
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+BM_TaskScheduling/EmptyTask/100000/1/100000/2/real_time    43911146 ns     35092000 ns           16 Completed tasks=1.6M Rejected tasks=0 Total tasks=1.6M accepted tasks=1.6M consumer_items_per_second=2.30025M items_per_second=2.27733M/s producer_items_per_second=2.88679M
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+BM_TaskScheduling/EmptyTask/100000/2/100000/2/real_time    66759078 ns     44521556 ns           11 Completed tasks=1100k Rejected tasks=0 Total tasks=1100k accepted tasks=1100k consumer_items_per_second=1.50915M items_per_second=1.49792M/s producer_items_per_second=2.27082M
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+BM_TaskScheduling/EmptyTask/100000/4/100000/2/real_time    69525037 ns     27448593 ns           11 Completed tasks=1100k Rejected tasks=0 Total tasks=1100k accepted tasks=1100k consumer_items_per_second=1.45115M items_per_second=1.43833M/s producer_items_per_second=3.69005M
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+BM_TaskScheduling/EmptyTask/100000/6/100000/2/real_time    58444538 ns     17910412 ns           13 Completed tasks=1.3M Rejected tasks=0 Total tasks=1.3M accepted tasks=1.3M consumer_items_per_second=1.73955M items_per_second=1.71102M/s producer_items_per_second=5.39982M
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+BM_TaskScheduling/EmptyTask/100000/8/100000/2/real_time    63306836 ns     14662374 ns           10 Completed tasks=1000k Rejected tasks=0 Total tasks=1000k accepted tasks=1000k consumer_items_per_second=1.60611M items_per_second=1.57961M/s producer_items_per_second=7.01889M
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+BM_TaskScheduling/EmptyTask/100000/1/100000/4/real_time    17212906 ns     14713212 ns           36 Completed tasks=3.6M Rejected tasks=0 Total tasks=3.6M accepted tasks=3.6M consumer_items_per_second=5.92858M items_per_second=5.80959M/s producer_items_per_second=6.96217M
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+BM_TaskScheduling/EmptyTask/100000/2/100000/4/real_time    45596544 ns     25121537 ns           26 Completed tasks=2.6M Rejected tasks=0 Total tasks=2.6M accepted tasks=2.6M consumer_items_per_second=2.22167M items_per_second=2.19315M/s producer_items_per_second=4.06798M
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+BM_TaskScheduling/EmptyTask/100000/4/100000/4/real_time    57216503 ns     33909731 ns           12 Completed tasks=1.2M Rejected tasks=0 Total tasks=1.2M accepted tasks=1.2M consumer_items_per_second=1.7665M items_per_second=1.74775M/s producer_items_per_second=2.99062M
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+BM_TaskScheduling/EmptyTask/100000/6/100000/4/real_time    52354742 ns     28376439 ns           11 Completed tasks=1100k Rejected tasks=0 Total tasks=1100k accepted tasks=1100k consumer_items_per_second=1.93977M items_per_second=1.91005M/s producer_items_per_second=3.5928M
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+BM_TaskScheduling/EmptyTask/100000/8/100000/4/real_time    50044928 ns     26461424 ns           10 Completed tasks=1000k Rejected tasks=0 Total tasks=1000k accepted tasks=1000k consumer_items_per_second=2.0401M items_per_second=1.9982M/s producer_items_per_second=3.51481M
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+BM_TaskScheduling/EmptyTask/100000/1/100000/6/real_time    36330957 ns     28350154 ns           19 Completed tasks=1.9M Rejected tasks=0 Total tasks=1.9M accepted tasks=1.9M consumer_items_per_second=2.78578M items_per_second=2.75247M/s producer_items_per_second=3.58151M
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+BM_TaskScheduling/EmptyTask/100000/2/100000/6/real_time    41336056 ns     22075426 ns           19 Completed tasks=1.9M Rejected tasks=0 Total tasks=1.9M accepted tasks=1.9M consumer_items_per_second=2.45764M items_per_second=2.4192M/s producer_items_per_second=4.67479M
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+BM_TaskScheduling/EmptyTask/100000/4/100000/6/real_time    51795853 ns     39684381 ns           12 Completed tasks=1.2M Rejected tasks=0 Total tasks=1.2M accepted tasks=1.2M consumer_items_per_second=1.95165M items_per_second=1.93066M/s producer_items_per_second=2.5499M
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+BM_TaskScheduling/EmptyTask/100000/6/100000/6/real_time    67477971 ns     59892934 ns           10 Completed tasks=1000k Rejected tasks=0 Total tasks=1000k accepted tasks=1000k consumer_items_per_second=1.49877M items_per_second=1.48197M/s producer_items_per_second=1.58645M
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+BM_TaskScheduling/EmptyTask/100000/8/100000/6/real_time    58442557 ns     50876915 ns           12 Completed tasks=1.2M Rejected tasks=0 Total tasks=1.2M accepted tasks=1.2M consumer_items_per_second=1.74015M items_per_second=1.71108M/s producer_items_per_second=1.90551M
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+BM_TaskScheduling/EmptyTask/100000/1/100000/8/real_time    38105719 ns     30770410 ns           19 Completed tasks=1.9M Rejected tasks=0 Total tasks=1.9M accepted tasks=1.9M consumer_items_per_second=2.65584M items_per_second=2.62428M/s producer_items_per_second=3.2986M
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+BM_TaskScheduling/EmptyTask/100000/2/100000/8/real_time    40277359 ns     24609097 ns           18 Completed tasks=1.8M Rejected tasks=0 Total tasks=1.8M accepted tasks=1.8M consumer_items_per_second=2.51802M items_per_second=2.48278M/s producer_items_per_second=4.16323M
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+BM_TaskScheduling/EmptyTask/100000/4/100000/8/real_time    52781998 ns     47056620 ns           13 Completed tasks=1.3M Rejected tasks=0 Total tasks=1.3M accepted tasks=1.3M consumer_items_per_second=1.91311M items_per_second=1.89459M/s producer_items_per_second=2.14532M
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+BM_TaskScheduling/EmptyTask/100000/6/100000/8/real_time    56650846 ns     51466294 ns           10 Completed tasks=1000k Rejected tasks=0 Total tasks=1000k accepted tasks=1000k consumer_items_per_second=1.78893M items_per_second=1.7652M/s producer_items_per_second=1.91191M
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+BM_TaskScheduling/EmptyTask/100000/8/100000/8/real_time    59475956 ns     54071249 ns           13 Completed tasks=1.3M Rejected tasks=0 Total tasks=1.3M accepted tasks=1.3M consumer_items_per_second=1.7088M items_per_second=1.68135M/s producer_items_per_second=1.80612M
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+BM_TaskScheduling/SmallTask/100000/1/100000/1/real_time   340025530 ns      4330096 ns            2 Completed tasks=200k Rejected tasks=0 Total tasks=200k accepted tasks=200k consumer_items_per_second=294.567k items_per_second=294.096k/s producer_items_per_second=26.9388M
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+BM_TaskScheduling/SmallTask/100000/2/100000/1/real_time   202162916 ns      4938283 ns            3 Completed tasks=300k Rejected tasks=0 Total tasks=300k accepted tasks=300k consumer_items_per_second=496.157k items_per_second=494.651k/s producer_items_per_second=23.4111M
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+BM_TaskScheduling/SmallTask/100000/4/100000/1/real_time   124830541 ns     28169797 ns            6 Completed tasks=600k Rejected tasks=0 Total tasks=600k accepted tasks=600k consumer_items_per_second=805.602k items_per_second=801.086k/s producer_items_per_second=3.44182M
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+BM_TaskScheduling/SmallTask/100000/6/100000/1/real_time   109563267 ns     30427547 ns            7 Completed tasks=700k Rejected tasks=0 Total tasks=700k accepted tasks=700k consumer_items_per_second=919.847k items_per_second=912.715k/s producer_items_per_second=3.17727M
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+BM_TaskScheduling/SmallTask/100000/8/100000/1/real_time    99741156 ns      7544320 ns            7 Completed tasks=700k Rejected tasks=0 Total tasks=700k accepted tasks=700k consumer_items_per_second=1014.39k items_per_second=1002.6k/s producer_items_per_second=13.5116M
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+BM_TaskScheduling/SmallTask/100000/1/100000/2/real_time   304863614 ns      4268448 ns            2 Completed tasks=200k Rejected tasks=0 Total tasks=200k accepted tasks=200k consumer_items_per_second=328.692k items_per_second=328.016k/s producer_items_per_second=28.1143M
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+BM_TaskScheduling/SmallTask/100000/2/100000/2/real_time   181250384 ns      4600320 ns            4 Completed tasks=400k Rejected tasks=0 Total tasks=400k accepted tasks=400k consumer_items_per_second=553.387k items_per_second=551.723k/s producer_items_per_second=25.0727M
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+BM_TaskScheduling/SmallTask/100000/4/100000/2/real_time   108804432 ns     14545335 ns            7 Completed tasks=700k Rejected tasks=0 Total tasks=700k accepted tasks=700k consumer_items_per_second=924.073k items_per_second=919.08k/s producer_items_per_second=6.99897M
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+BM_TaskScheduling/SmallTask/100000/6/100000/2/real_time    90602247 ns     14169456 ns            8 Completed tasks=800k Rejected tasks=0 Total tasks=800k accepted tasks=800k consumer_items_per_second=1.11615M items_per_second=1.10373M/s producer_items_per_second=5.6987M
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+BM_TaskScheduling/SmallTask/100000/8/100000/2/real_time    78337004 ns      7038116 ns            9 Completed tasks=900k Rejected tasks=0 Total tasks=900k accepted tasks=900k consumer_items_per_second=1.29406M items_per_second=1.27654M/s producer_items_per_second=15.6625M
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+BM_TaskScheduling/SmallTask/100000/1/100000/4/real_time   300264997 ns      3443472 ns            2 Completed tasks=200k Rejected tasks=0 Total tasks=200k accepted tasks=200k consumer_items_per_second=333.59k items_per_second=333.039k/s producer_items_per_second=34.3155M
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+BM_TaskScheduling/SmallTask/100000/2/100000/4/real_time   172909169 ns      4716832 ns            4 Completed tasks=400k Rejected tasks=0 Total tasks=400k accepted tasks=400k consumer_items_per_second=580.032k items_per_second=578.338k/s producer_items_per_second=24.172M
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+BM_TaskScheduling/SmallTask/100000/4/100000/4/real_time   101287327 ns      6583109 ns            7 Completed tasks=700k Rejected tasks=0 Total tasks=700k accepted tasks=700k consumer_items_per_second=993.825k items_per_second=987.29k/s producer_items_per_second=16.6988M
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+BM_TaskScheduling/SmallTask/100000/6/100000/4/real_time    82959570 ns      5786162 ns            9 Completed tasks=900k Rejected tasks=0 Total tasks=900k accepted tasks=900k consumer_items_per_second=1.21942M items_per_second=1.20541M/s producer_items_per_second=20.2709M
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+BM_TaskScheduling/SmallTask/100000/8/100000/4/real_time    70338595 ns      5842311 ns            9 Completed tasks=900k Rejected tasks=0 Total tasks=900k accepted tasks=900k consumer_items_per_second=1.44305M items_per_second=1.42169M/s producer_items_per_second=18.375M
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+BM_TaskScheduling/SmallTask/100000/1/100000/6/real_time   301665844 ns      4553056 ns            2 Completed tasks=200k Rejected tasks=0 Total tasks=200k accepted tasks=200k consumer_items_per_second=332.147k items_per_second=331.493k/s producer_items_per_second=25.663M
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+BM_TaskScheduling/SmallTask/100000/2/100000/6/real_time   175630777 ns      4753624 ns            4 Completed tasks=400k Rejected tasks=0 Total tasks=400k accepted tasks=400k consumer_items_per_second=571.1k items_per_second=569.376k/s producer_items_per_second=23.4031M
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+BM_TaskScheduling/SmallTask/100000/4/100000/6/real_time   104237265 ns      5870405 ns            6 Completed tasks=600k Rejected tasks=0 Total tasks=600k accepted tasks=600k consumer_items_per_second=964.523k items_per_second=959.35k/s producer_items_per_second=18.1199M
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+BM_TaskScheduling/SmallTask/100000/6/100000/6/real_time    78952433 ns      5201408 ns           10 Completed tasks=1000k Rejected tasks=0 Total tasks=1000k accepted tasks=1000k consumer_items_per_second=1.27938M items_per_second=1.26659M/s producer_items_per_second=21.4227M
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+BM_TaskScheduling/SmallTask/100000/8/100000/6/real_time    68490800 ns      6070164 ns           11 Completed tasks=1100k Rejected tasks=0 Total tasks=1100k accepted tasks=1100k consumer_items_per_second=1.48402M items_per_second=1.46005M/s producer_items_per_second=19.9565M
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+BM_TaskScheduling/SmallTask/100000/1/100000/8/real_time   300333904 ns      4528976 ns            2 Completed tasks=200k Rejected tasks=0 Total tasks=200k accepted tasks=200k consumer_items_per_second=333.885k items_per_second=332.963k/s producer_items_per_second=24.2981M
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+BM_TaskScheduling/SmallTask/100000/2/100000/8/real_time   166211619 ns      4788480 ns            4 Completed tasks=400k Rejected tasks=0 Total tasks=400k accepted tasks=400k consumer_items_per_second=603.754k items_per_second=601.643k/s producer_items_per_second=22.5848M
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+BM_TaskScheduling/SmallTask/100000/4/100000/8/real_time    99326947 ns      6092123 ns            7 Completed tasks=700k Rejected tasks=0 Total tasks=700k accepted tasks=700k consumer_items_per_second=1013.14k items_per_second=1006.78k/s producer_items_per_second=17.5128M
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+BM_TaskScheduling/SmallTask/100000/6/100000/8/real_time    76460598 ns      4593418 ns           10 Completed tasks=1000k Rejected tasks=0 Total tasks=1000k accepted tasks=1000k consumer_items_per_second=1.32139M items_per_second=1.30786M/s producer_items_per_second=27.1909M
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+Total work consumed: 100000
+BM_TaskScheduling/SmallTask/100000/8/100000/8/real_time    68016690 ns      7182275 ns           10 Completed tasks=1000k Rejected tasks=0 Total tasks=1000k accepted tasks=1000k consumer_items_per_second=1.49439M items_per_second=1.47023M/s producer_items_per_second=9.73236M
+Total work consumed: 100000
+BM_TaskScheduling/MediumTask/100000/1/100000/1/real_time 28992357195 ns      3716064 ns            1 Completed tasks=100k Rejected tasks=0 Total tasks=100k accepted tasks=100k consumer_items_per_second=3.44926k items_per_second=3.44918k/s producer_items_per_second=33.5281M
+Total work consumed: 100000
+BM_TaskScheduling/MediumTask/100000/2/100000/1/real_time 14542424539 ns      4936224 ns            1 Completed tasks=100k Rejected tasks=0 Total tasks=100k accepted tasks=100k consumer_items_per_second=6.87686k items_per_second=6.87643k/s producer_items_per_second=25.0977M
+Total work consumed: 100000
+BM_TaskScheduling/MediumTask/100000/4/100000/1/real_time 7280215247 ns      3472032 ns            1 Completed tasks=100k Rejected tasks=0 Total tasks=100k accepted tasks=100k consumer_items_per_second=13.7371k items_per_second=13.7359k/s producer_items_per_second=36.7919M
+Total work consumed: 100000
+BM_TaskScheduling/MediumTask/100000/6/100000/1/real_time 4920058292 ns      3525568 ns            1 Completed tasks=100k Rejected tasks=0 Total tasks=100k accepted tasks=100k consumer_items_per_second=20.3282k items_per_second=20.325k/s producer_items_per_second=38.8498M
+Total work consumed: 100000
+BM_TaskScheduling/MediumTask/100000/8/100000/1/real_time 4913455021 ns      4198272 ns            1 Completed tasks=100k Rejected tasks=0 Total tasks=100k accepted tasks=100k consumer_items_per_second=20.3585k items_per_second=20.3523k/s producer_items_per_second=39.086M
+Total work consumed: 100000
+BM_TaskScheduling/MediumTask/100000/1/100000/2/real_time 28992470625 ns      3666560 ns            1 Completed tasks=100k Rejected tasks=0 Total tasks=100k accepted tasks=100k consumer_items_per_second=3.44925k items_per_second=3.44917k/s producer_items_per_second=34.4283M
+Total work consumed: 100000
+BM_TaskScheduling/MediumTask/100000/2/100000/2/real_time 14540322890 ns      4921184 ns            1 Completed tasks=100k Rejected tasks=0 Total tasks=100k accepted tasks=100k consumer_items_per_second=6.87783k items_per_second=6.87743k/s producer_items_per_second=25.1126M
+Total work consumed: 100000
+BM_TaskScheduling/MediumTask/100000/4/100000/2/real_time 7273592436 ns      3468768 ns            1 Completed tasks=100k Rejected tasks=0 Total tasks=100k accepted tasks=100k consumer_items_per_second=13.7496k items_per_second=13.7484k/s producer_items_per_second=37.0858M
+Total work consumed: 100000
+BM_TaskScheduling/MediumTask/100000/6/100000/2/real_time 5187103350 ns      5366752 ns            1 Completed tasks=100k Rejected tasks=0 Total tasks=100k accepted tasks=100k consumer_items_per_second=19.2841k items_per_second=19.2786k/s producer_items_per_second=23.2664M
+Total work consumed: 100000
+BM_TaskScheduling/MediumTask/100000/8/100000/2/real_time 4907988558 ns      6394112 ns            1 Completed tasks=100k Rejected tasks=0 Total tasks=100k accepted tasks=100k consumer_items_per_second=20.3823k items_per_second=20.3749k/s producer_items_per_second=7.73811M
+Total work consumed: 100000
+BM_TaskScheduling/MediumTask/100000/1/100000/4/real_time 28989637405 ns      6699488 ns            1 Completed tasks=100k Rejected tasks=0 Total tasks=100k accepted tasks=100k consumer_items_per_second=3.44961k items_per_second=3.44951k/s producer_items_per_second=16.6833M
+Total work consumed: 100000
+BM_TaskScheduling/MediumTask/100000/2/100000/4/real_time 14514294818 ns      4063104 ns            1 Completed tasks=100k Rejected tasks=0 Total tasks=100k accepted tasks=100k consumer_items_per_second=6.89007k items_per_second=6.88976k/s producer_items_per_second=30.2527M
+Total work consumed: 100000
+BM_TaskScheduling/MediumTask/100000/4/100000/4/real_time 7262883542 ns      6108128 ns            1 Completed tasks=100k Rejected tasks=0 Total tasks=100k accepted tasks=100k consumer_items_per_second=13.7703k items_per_second=13.7686k/s producer_items_per_second=19.4703M
+Total work consumed: 100000
+BM_TaskScheduling/MediumTask/100000/6/100000/4/real_time 4902183487 ns      4466752 ns            1 Completed tasks=100k Rejected tasks=0 Total tasks=100k accepted tasks=100k consumer_items_per_second=20.4023k items_per_second=20.3991k/s producer_items_per_second=26.6195M
+Total work consumed: 100000
+BM_TaskScheduling/MediumTask/100000/8/100000/4/real_time 4906870618 ns      4517824 ns            1 Completed tasks=100k Rejected tasks=0 Total tasks=100k accepted tasks=100k consumer_items_per_second=20.3857k items_per_second=20.3796k/s producer_items_per_second=34.3613M
+Total work consumed: 100000
+BM_TaskScheduling/MediumTask/100000/1/100000/6/real_time 28975238169 ns      5060192 ns            1 Completed tasks=100k Rejected tasks=0 Total tasks=100k accepted tasks=100k consumer_items_per_second=3.45131k items_per_second=3.45122k/s producer_items_per_second=23.3088M
+Total work consumed: 100000
+BM_TaskScheduling/MediumTask/100000/2/100000/6/real_time 14504922311 ns      4829536 ns            1 Completed tasks=100k Rejected tasks=0 Total tasks=100k accepted tasks=100k consumer_items_per_second=6.89461k items_per_second=6.89421k/s producer_items_per_second=25.6189M
+Total work consumed: 100000
+BM_TaskScheduling/MediumTask/100000/4/100000/6/real_time 7264243184 ns      3341152 ns            1 Completed tasks=100k Rejected tasks=0 Total tasks=100k accepted tasks=100k consumer_items_per_second=13.7673k items_per_second=13.7661k/s producer_items_per_second=38.7156M
+Total work consumed: 100000
+BM_TaskScheduling/MediumTask/100000/6/100000/6/real_time 4915688689 ns      3763232 ns            1 Completed tasks=100k Rejected tasks=0 Total tasks=100k accepted tasks=100k consumer_items_per_second=20.3464k items_per_second=20.343k/s producer_items_per_second=35.286M
+Total work consumed: 100000
+BM_TaskScheduling/MediumTask/100000/8/100000/6/real_time 4914658020 ns      4433152 ns            1 Completed tasks=100k Rejected tasks=0 Total tasks=100k accepted tasks=100k consumer_items_per_second=20.352k items_per_second=20.3473k/s producer_items_per_second=31.9754M
+Total work consumed: 100000
+BM_TaskScheduling/MediumTask/100000/1/100000/8/real_time 28976633024 ns      4625056 ns            1 Completed tasks=100k Rejected tasks=0 Total tasks=100k accepted tasks=100k consumer_items_per_second=3.45113k items_per_second=3.45106k/s producer_items_per_second=25.6506M
+Total work consumed: 100000
+BM_TaskScheduling/MediumTask/100000/2/100000/8/real_time 14505092342 ns      4856768 ns            1 Completed tasks=100k Rejected tasks=0 Total tasks=100k accepted tasks=100k consumer_items_per_second=6.89452k items_per_second=6.89413k/s producer_items_per_second=25.1158M
+Total work consumed: 100000
+BM_TaskScheduling/MediumTask/100000/4/100000/8/real_time 7261150116 ns      3519264 ns            1 Completed tasks=100k Rejected tasks=0 Total tasks=100k accepted tasks=100k consumer_items_per_second=13.7733k items_per_second=13.7719k/s producer_items_per_second=36.9211M
+Total work consumed: 100000
+BM_TaskScheduling/MediumTask/100000/6/100000/8/real_time 4891008015 ns      5596512 ns            1 Completed tasks=100k Rejected tasks=0 Total tasks=100k accepted tasks=100k consumer_items_per_second=20.4501k items_per_second=20.4457k/s producer_items_per_second=22.6994M
+Total work consumed: 100000
+BM_TaskScheduling/MediumTask/100000/8/100000/8/real_time 4885534474 ns      4337024 ns            1 Completed tasks=100k Rejected tasks=0 Total tasks=100k accepted tasks=100k consumer_items_per_second=20.4748k items_per_second=20.4686k/s producer_items_per_second=37.1926M
