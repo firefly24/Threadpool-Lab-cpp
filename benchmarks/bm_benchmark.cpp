@@ -36,10 +36,10 @@ static void BM_TaskScheduling(benchmark::State& state, Task workload)
 	
 	// set-up the parameters
 	std::size_t queue_size = state.range(0);
-	std::size_t num_workers = state.range(1);
+	std::size_t batch_size = state.range(1);
 	std::size_t num_tasks = state.range(2);	
 	
-	std::size_t batch_size = state.range(3);
+	std::size_t num_workers = state.range(3);
 	
 	// for stats and diagnoatics
 	std::size_t total_tasks =0;
@@ -130,7 +130,7 @@ BENCHMARK_CAPTURE( BM_TaskScheduling,	// benchmarking function
 					Task(smallTask)		// Workload for benchmarking
 				)->ArgsProduct({
 								{100000},
-								{1,2,4,6,8},
+								{1,2,4,6,8,10,12},
 								{100000},
 								{1,2,4,6,8}
 							   })->UseRealTime();
@@ -146,7 +146,8 @@ BENCHMARK_CAPTURE( BM_TaskScheduling,	// benchmarking function
 							   })->UseRealTime();
 							   
 							   
-/** Takes quite some time, so run only when benchmarking for heavy workloads
+/** Takes quite some time, so run only when benchmarking for heavy workloads*/
+
 BENCHMARK_CAPTURE( BM_TaskScheduling,	// benchmarking function
 					LargeTask, 			// label for output
 					Task(largeTask)		// Workload for benchmarking
@@ -157,7 +158,7 @@ BENCHMARK_CAPTURE( BM_TaskScheduling,	// benchmarking function
 								{1,2,4,6,8}
 							   })->UseRealTime();
 
-*/
+/**/
 
 int main(int argc, char** argv)
 {

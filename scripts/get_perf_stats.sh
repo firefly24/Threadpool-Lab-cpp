@@ -25,7 +25,7 @@ if [ ! -x "$PROJECT_ROOT/$BENCH" ]; then
 	make benchmark-perf -C "$PROJECT_ROOT"
 fi
 
-FILTER="BM_TaskScheduling/$WORKLOAD/100000/$WORKERS/100000/$BATCH_SIZE"
+FILTER="BM_TaskScheduling/$WORKLOAD/100000/$BATCH_SIZE/100000/$WORKERS"
 
 
 TIMESTAMP=$(date +"%Y-%m-%d_%H-%M-%S")

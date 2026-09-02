@@ -36,17 +36,17 @@ fi
 
 if [ "$#" -eq 2 ]; then
 	WORKLOAD=$1
-	WORKERS=$2
-	echo "Running benchmark for workload: $WORKLOAD, with Workers: $WORKERS" >&2
-	FILTER="BM_TaskScheduling/$WORKLOAD/100000/$WORKERS/100000"
+	BATCH_SIZE=$2
+	echo "Running benchmark for workload: $WORKLOAD, with batch:$BATCH_SIZE" >&2
+	FILTER="BM_TaskScheduling/$WORKLOAD/100000/$BATCH_SIZE/100000"
 fi
 
 if [ "$#" -eq 3 ]; then
 	WORKLOAD=$1
-	WORKERS=$2
-	BATCH_SIZE=$3
+	BATCH_SIZE=$2
+	WORKERS=$3
 	echo "Running benchmark for workload: $WORKLOAD, with Workers: $WORKERS, batch:$BATCH_SIZE" >&2
-	FILTER="BM_TaskScheduling/$WORKLOAD/100000/$WORKERS/100000/$BATCH_SIZE"
+	FILTER="BM_TaskScheduling/$WORKLOAD/100000/$BATCH_SIZE/100000/$WORKERS"
 fi
 
 TIMESTAMP=$(date +"%Y-%m-%d_%H-%M-%S")
