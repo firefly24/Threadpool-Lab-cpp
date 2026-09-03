@@ -11,10 +11,12 @@
 #include <pthread.h>
 #include <string>
 #include <cstddef>
+#include <memory>
 
 //#include "queue/concurrent_queue.hpp"
 #include "./instrumentation/tracing.hpp"
-#include "queue/SPMC_locked/spmc_queue.hpp"
+//#include "queue/SPMC_locked/spmc_queue.hpp"
+#include "queue/SPSC_queue/spsc_lockfree.hpp"
 
 static constexpr std::size_t CREATED = 0;
 static constexpr std::size_t RUNNING = 1;
@@ -24,12 +26,15 @@ template <typename Task>
 class ThreadPool
 {
 private:
-
-    //ConcurrentQueue<Task> task_queue_;
-    SPMCQueueLocked<Task> task_queue_;
+    std::size_t pool_capacity_;
     std::size_t max_workers_;
-    std::size_t task_batch_size_;
-    std::counting_semaphore<INT_MAX> work_items_;
+    
+    // per-worker queue specific 
+    QueueTopology queue_type_;
+  	std::vector<std::unique_ptr<SPSCQueue<Task>>> worker_queues_;
+    std::vector<std::unique_ptr<std::counting_semaphore<INT_MAX>>> work_;
+    std::size_t next_worker_;
+    
     
     // thread pool state related
     std::atomic<unsigned int> completed_tasks_;
@@ -48,15 +53,13 @@ private:
     ThreadPool &operator=(ThreadPool &&) = delete;
 
     // Worker thread function to pop tasks from the queue and execute them
-    void startWorkerThread() noexcept;
-       
-    // Worker thread function to pop tasks in a batch from the queue and execute them
-    void startWorkerThreadBatched() noexcept;
+    void startWorkerThread(std::size_t worker_id) noexcept;
 
 public:
-
-	// initialize threadpool, if batch size not provided, keep default 1 task per pop behavior
-	explicit ThreadPool(std::size_t task_capacity, std::size_t max_workers, std::size_t batch_size =1);
+						
+	// initialize threadpool, for per worker behavior
+	explicit ThreadPool(std::size_t task_capacity, 
+						std::size_t max_workers);
 
     unsigned int completedTaskCount()
     {
@@ -82,19 +85,33 @@ public:
 };
 
 
-
 template<typename Task>
-ThreadPool<Task>::ThreadPool(std::size_t task_capacity, std::size_t max_worker,std::size_t batch_size) :
-					task_queue_(task_capacity),
+ThreadPool<Task>::ThreadPool(std::size_t task_capacity, 
+							 std::size_t max_worker) :
+					pool_capacity_(task_capacity),
 					max_workers_(max_worker),  
-					task_batch_size_(batch_size),
-					work_items_(0),
+					queue_type_(QueueTopology::PerWorker),
+					next_worker_(0),
 					completed_tasks_(0),
 					stop_requested_(false),
 					threadpool_stopped_(false),
 					pool_state_(CREATED)			
 {
-	//launchWorkers();
+
+	// For now, if queue type is mentioned, this constructor assumes Per Worker sharded queues by default
+	std::size_t perworker_capacity = pool_capacity_/max_workers_;
+	std::size_t leftover = pool_capacity_ % max_workers_;
+	
+	worker_queues_.reserve(max_workers_);	
+	work_.reserve(max_workers_);	
+	
+	for (std::size_t worker = 0; worker < max_workers_; worker++)
+	{
+		std::size_t per_queue_capacity = perworker_capacity 
+									+ ((worker < leftover)?1:0);
+		worker_queues_.push_back(std::make_unique<SPSCQueue<Task>>(per_queue_capacity));
+		work_.push_back(std::make_unique<std::counting_semaphore<INT_MAX>>(0));
+	}
 }
 
 
@@ -106,16 +123,14 @@ bool ThreadPool<Task>::launchWorkers()
 			return false;
 		
     // Initialize worker threads
-    for (size_t worker = 0; worker < max_workers_; worker++) {
+    for (size_t worker = 0; worker < max_workers_; worker++) 
+    {
         worker_threads_.emplace_back([this,worker]() 
         	{ 
         		std::string worker_name = "TPWorker-"+ std::to_string(worker);
     			pthread_setname_np(pthread_self(), worker_name.c_str());
-    			
-    			if (task_batch_size_ > 1)
-        			this->startWorkerThreadBatched();
-        		else
-        			this->startWorkerThread();
+
+        		this->startWorkerThread(worker);
         	}
         ); 
 	}
@@ -127,11 +142,19 @@ bool ThreadPool<Task>::launchWorkers()
 template<typename Task>
 bool ThreadPool<Task>::taskSubmit(Task& task)
 {
+	
+	std::size_t worker = next_worker_;
+	
+	next_worker_ = (next_worker_+1) % max_workers_;
+	
 	// possible race where task can still submit after stop requested
-    if (!stop_requested_.load(std::memory_order_acquire)  && task_queue_.tryPush(task) )
+    if (!stop_requested_.load(std::memory_order_acquire)  )
     {
-    	work_items_.release();
-    	return true;
+    	if (worker_queues_[worker]->tryPush(task))
+ 		{
+    		work_[worker]->release();
+    		return true;
+    	}
     }
     	
     return false;
@@ -141,11 +164,17 @@ bool ThreadPool<Task>::taskSubmit(Task& task)
 template<typename Task>
 bool ThreadPool<Task>::taskSubmit(Task&& task)
 {
+	std::size_t worker = next_worker_;
+	
+	next_worker_ = (next_worker_ +1)% max_workers_;
 	// possible race where task can still submit after stop requested
-    if (!stop_requested_.load(std::memory_order_acquire) && task_queue_.tryPush(std::move(task)) ) 
+    if (!stop_requested_.load(std::memory_order_acquire) ) 
     {
-    	work_items_.release();
-    	return true;
+    	if (worker_queues_[worker]->tryPush(std::move(task)) )
+    	{
+    		work_[worker]->release();
+    		return true;
+    	}
     }
     
 	return false;
@@ -166,7 +195,7 @@ void ThreadPool<Task>::stopPool()
 		
 		// Notify all worker threads to wake up and return now as queue is empty
 		for (std::size_t worker=0; worker<max_workers_; worker++)
-			work_items_.release();
+			work_[worker]->release();
 			
 		// Join all worker threads
 		for (auto &worker : worker_threads_)
@@ -194,9 +223,12 @@ ThreadPool<Task>::~ThreadPool()
 
 // Worker thread function to pop tasks from the queue and execute them
 template<typename Task>
-void ThreadPool<Task>::startWorkerThread() noexcept
+void ThreadPool<Task>::startWorkerThread(std::size_t worker_id) noexcept
 {
     Task task;
+    
+    auto& task_queue_ = *worker_queues_[worker_id];
+    auto& work_items_ = *work_[worker_id];
     
     // keep polling for new tasks on this thread
     while (true)
@@ -242,81 +274,6 @@ stop_worker:
 	return;
 	
 }
-
-template<typename Task>
-void ThreadPool<Task>::startWorkerThreadBatched() noexcept
-{
-    Task task;
-
-    // Add per thread batching infrastrructure
-    std::vector<Task> local_batch;
-    local_batch.reserve(task_batch_size_);
-    std::size_t work_permits = 0;
-    std::size_t pulled_work = 0;
-   
-    // keep polling for new tasks on this thread
-    while (true)
-    {
-    	local_batch.clear();
-		work_permits = 0;
-		pulled_work = 0;
-		
-        // Wait until there is a task in the queue
-		work_items_.acquire();
-		work_permits =1;
-		
-		// Take n work permits optimistically
-		while((work_permits < task_batch_size_) && work_items_.try_acquire())
-			work_permits++;
-		
-		//batch pop from the queue
-		pulled_work = task_queue_.tryPopBatch(local_batch, work_permits);
-		
-		// This assert checks for any discrepancy in the semaphore- work_permit contract
-		// The work permits can only be greater than pulled work when it consumes shutdown permits in valid case
-		assert(stop_requested_.load(std::memory_order_acquire) || (pulled_work == work_permits) );
-		
-		// Execute the task batch 
-		for(std::size_t idx = 0; idx < pulled_work; idx++)
-		{
-		    try
-		    {
-		    	TP_TRACE_EVENT("ExecuteTask");
-		        task = std::move(local_batch[idx]);
-		        task();
-		    }
-		    catch (...)
-		    {
-		        std::cerr << "Task thown exception" << std::endl;
-		    }   
-		}
-		
-		// Update completed task count
-        completed_tasks_.fetch_add(pulled_work,std::memory_order_relaxed);
-		
-		// return only if pool is stopped and all tasks are completed
-		if (stop_requested_.load(std::memory_order_acquire))
-		{
-			std::size_t shutdown_permits_consumed = work_permits - pulled_work;
-			while(shutdown_permits_consumed)
-        	{
-        		// some additional permits emitted for stop may have been consumed by this thread, re-emit them to unblock other threads and exit
-        		shutdown_permits_consumed--;
-        		work_items_.release();
-        	}
-        	
-			if(task_queue_.empty())
-			{	
-				// stop is requested and no remaining task, we can safely retire this worker thread
-				return;		
-			}
-		}
-    }
-    
-	return;
-	
-}
-
 
 
 #endif /* SIMPLE_THREADPOOL_H */

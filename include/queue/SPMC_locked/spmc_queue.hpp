@@ -1,18 +1,12 @@
-#include <cstddef>
-#include <atomic>
+#pragma once
+
+
 #include <vector>
 #include <iostream>
 #include <mutex>
 #include <utility>
 
-
-// define cache line padded atomic  indexes tp avoid false sharing impact
-struct alignas(64) padded_cacheline_var{
-    std::atomic<std::size_t> index;
-    padded_cacheline_var(std::size_t idx): index(idx){}    
-}typedef PaddedAtomicIdx;
-
-
+#include "../queue_helpers.hpp"
 
 template <typename T>
 class SPMCQueueLocked

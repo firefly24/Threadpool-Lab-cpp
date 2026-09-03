@@ -7,7 +7,8 @@ TARGET := threadpool
 SRC := examples/simple_thread_pool.cpp
 
 TEST_TARGET := test_basic
-TEST_SRC := tests/test_basic.cpp
+#TEST_SRC := tests/test_basic.cpp
+TEST_SRC := tests/test_basic_sharded_q.cpp
 
 SPSC_TEST_TARGET := spsc_test
 SPSC_TEST_SRC := tests/test_queue_spsc.cpp
@@ -16,7 +17,8 @@ BENCH_TARGET := run_bench
 BENCH_TARGET_TRACED := run_bench_traced
 BENCH_TARGET_PERF := run_bench-perf
 #BENCH_SRC := benchmarks/benchmark_threadpool.cpp
-BENCH_SRC := benchmarks/bm_benchmark.cpp
+#BENCH_SRC := benchmarks/bm_benchmark.cpp
+BENCH_SRC := benchmarks/sharded_tp_benchmark.cpp
 
 PERFETTO_DIR := third_party/perfetto
 PERFETTO_SRC := $(PERFETTO_DIR)/perfetto.cc
