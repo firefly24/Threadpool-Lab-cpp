@@ -9,6 +9,9 @@ SRC := examples/simple_thread_pool.cpp
 TEST_TARGET := test_basic
 TEST_SRC := tests/test_basic.cpp
 
+SPSC_TEST_TARGET := spsc_test
+SPSC_TEST_SRC := tests/test_queue_spsc.cpp
+
 BENCH_TARGET := run_bench
 BENCH_TARGET_TRACED := run_bench_traced
 BENCH_TARGET_PERF := run_bench-perf
@@ -23,7 +26,7 @@ TRACING_SRC := src/instrumentation/tracing.cpp
 TRACING_OBJ := tracing.o
 NOTRACING_OBJ := notracing.o
 
-.PHONY: all test benchmark benchmark-traced clean
+.PHONY: all test spsc_test benchmark benchmark-traced clean
 
 all: $(TARGET)
 
@@ -33,7 +36,10 @@ $(TARGET):
 
 # build tests
 test: $(NOTRACING_OBJ)
-	$(CXX) $(CXXFLAGS) $(INCLUDES) $(TEST_SRC) $(NOTRACING_OBJ) -o $(TEST_TARGET) -fsanitize=thread -g -O3 -lpthread
+	$(CXX) $(CXXFLAGS) $(INCLUDES) $(TEST_SRC) $(NOTRACING_OBJ) -o $(TEST_TARGET) -fsanitize=thread -g -O1 -lpthread
+	
+spsc_test: $(NOTRACING_OBJ)
+	$(CXX) $(CXXFLAGS) $(INCLUDES) $(SPSC_TEST_SRC) $(NOTRACING_OBJ) -o $(SPSC_TEST_TARGET) -fsanitize=thread -g -O3 -lpthread
 	
 # Release build - for performance testing
 benchmark: $(NOTRACING_OBJ) 
@@ -63,4 +69,4 @@ $(PERFETTO_OBJ): $(PERFETTO_SRC)
 
 # clean artifacts
 clean:
-	rm -f $(TARGET) $(TEST_TARGET) $(BENCH_TARGET) $(PERFETTO_OBJ)  $(TRACING_OBJ) $(NOTRACING_OBJ) $(BENCH_TARGET_TRACED) $(BENCH_TARGET_PERF)
+	rm -f $(TARGET) $(TEST_TARGET) $(BENCH_TARGET) $(PERFETTO_OBJ)  $(TRACING_OBJ) $(NOTRACING_OBJ) $(BENCH_TARGET_TRACED) $(BENCH_TARGET_PERF) $(SPSC_TEST_TARGET)
