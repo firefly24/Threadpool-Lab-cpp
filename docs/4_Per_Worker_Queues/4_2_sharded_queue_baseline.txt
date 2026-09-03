@@ -1,0 +1,60 @@
+darshana@darshana-desktop:~/practice/Threadpool-lab-cpp$ ./run_bench-perf --benchmark_filter="BM_TaskSchedSharded/SmallTask/100000"
+2026-09-03T21:31:28+05:30
+Running ./run_bench-perf
+Run on (6 X 1728 MHz CPU s)
+CPU Caches:
+  L1 Data 64 KiB (x6)
+  L1 Instruction 64 KiB (x6)
+  L2 Unified 256 KiB (x6)
+  L3 Unified 2048 KiB (x1)
+Load Average: 0.10, 0.39, 0.47
+***WARNING*** CPU scaling is enabled, the benchmark real time measurements may be noisy and will incur extra overhead.
+------------------------------------------------------------------------------------------------------------------
+Benchmark                                                        Time             CPU   Iterations UserCounters...
+------------------------------------------------------------------------------------------------------------------
+BM_TaskSchedSharded/SmallTask/100000/1/100000/real_time  301233051 ns      5368320 ns            2 Completed tasks=200k Rejected tasks=0 Total tasks=200k accepted tasks=200k consumer_items_per_second=333.407k items_per_second=331.969k/s producer_items_per_second=22.8801M
+BM_TaskSchedSharded/SmallTask/100000/2/100000/real_time  170487267 ns      5725872 ns            4 Completed tasks=400k Rejected tasks=0 Total tasks=400k accepted tasks=400k consumer_items_per_second=590.183k items_per_second=586.554k/s producer_items_per_second=19.3981M
+BM_TaskSchedSharded/SmallTask/100000/4/100000/real_time   99606297 ns      5734080 ns            7 Completed tasks=700k Rejected tasks=0 Total tasks=700k accepted tasks=700k consumer_items_per_second=1011.29k items_per_second=1003.95k/s producer_items_per_second=19.2409M
+BM_TaskSchedSharded/SmallTask/100000/6/100000/real_time   77582271 ns      7126429 ns           10 Completed tasks=1000k Rejected tasks=0 Total tasks=1000k accepted tasks=1000k consumer_items_per_second=1.30533M items_per_second=1.28895M/s producer_items_per_second=15.7073M
+BM_TaskSchedSharded/SmallTask/100000/8/100000/real_time   83219504 ns     10158482 ns            9 Completed tasks=900k Rejected tasks=0 Total tasks=900k accepted tasks=900k consumer_items_per_second=1.22072M items_per_second=1.20164M/s producer_items_per_second=7.87995M
+darshana@darshana-desktop:~/practice/Threadpool-lab-cpp$ ./run_bench-perf --benchmark_filter="BM_TaskSchedSharded/MediumTask/100000"
+2026-09-03T22:34:23+05:30
+Running ./run_bench-perf
+Run on (6 X 1728 MHz CPU s)
+CPU Caches:
+  L1 Data 64 KiB (x6)
+  L1 Instruction 64 KiB (x6)
+  L2 Unified 256 KiB (x6)
+  L3 Unified 2048 KiB (x1)
+Load Average: 0.29, 0.38, 0.20
+***WARNING*** CPU scaling is enabled, the benchmark real time measurements may be noisy and will incur extra overhead.
+-------------------------------------------------------------------------------------------------------------------
+Benchmark                                                         Time             CPU   Iterations UserCounters...
+-------------------------------------------------------------------------------------------------------------------
+BM_TaskSchedSharded/MediumTask/100000/1/100000/real_time 28983111806 ns      6184224 ns            1 Completed tasks=100k Rejected tasks=0 Total tasks=100k accepted tasks=100k consumer_items_per_second=3.45064k items_per_second=3.45029k/s producer_items_per_second=30.9551M
+BM_TaskSchedSharded/MediumTask/100000/2/100000/real_time 14525774704 ns      5703296 ns            1 Completed tasks=100k Rejected tasks=0 Total tasks=100k accepted tasks=100k consumer_items_per_second=6.88544k items_per_second=6.88431k/s producer_items_per_second=30.3628M
+BM_TaskSchedSharded/MediumTask/100000/4/100000/real_time 7272221288 ns      6788480 ns            1 Completed tasks=100k Rejected tasks=0 Total tasks=100k accepted tasks=100k consumer_items_per_second=13.7554k items_per_second=13.751k/s producer_items_per_second=22.4294M
+BM_TaskSchedSharded/MediumTask/100000/6/100000/real_time 5035423397 ns      4897824 ns            1 Completed tasks=100k Rejected tasks=0 Total tasks=100k accepted tasks=100k consumer_items_per_second=19.8634k items_per_second=19.8593k/s producer_items_per_second=26.4514M
+BM_TaskSchedSharded/MediumTask/100000/8/100000/real_time 5077974478 ns      6922528 ns            1 Completed tasks=100k Rejected tasks=0 Total tasks=100k accepted tasks=100k consumer_items_per_second=19.6995k items_per_second=19.6929k/s producer_items_per_second=6.93493M
+darshana@darshana-desktop:~/practice/Threadpool-lab-cpp$ ./run_bench-perf --benchmark_filter="BM_TaskSchedSharded/EmptyTask/100000"
+2026-09-03T22:37:16+05:30
+Running ./run_bench-perf
+Run on (6 X 1728 MHz CPU s)
+CPU Caches:
+  L1 Data 64 KiB (x6)
+  L1 Instruction 64 KiB (x6)
+  L2 Unified 256 KiB (x6)
+  L3 Unified 2048 KiB (x1)
+Load Average: 0.70, 0.71, 0.37
+***WARNING*** CPU scaling is enabled, the benchmark real time measurements may be noisy and will incur extra overhead.
+------------------------------------------------------------------------------------------------------------------
+Benchmark                                                        Time             CPU   Iterations UserCounters...
+------------------------------------------------------------------------------------------------------------------
+BM_TaskSchedSharded/EmptyTask/100000/1/100000/real_time   22471797 ns     19751835 ns           42 Completed tasks=4.2M Rejected tasks=0 Total tasks=4.2M accepted tasks=4.2M consumer_items_per_second=4.52215M items_per_second=4.45002M/s producer_items_per_second=5.14971M
+BM_TaskSchedSharded/EmptyTask/100000/2/100000/real_time   90688271 ns     90521344 ns            9 Completed tasks=900k Rejected tasks=0 Total tasks=900k accepted tasks=900k consumer_items_per_second=1.10979M items_per_second=1.10268M/s producer_items_per_second=1.11033M
+BM_TaskSchedSharded/EmptyTask/100000/4/100000/real_time   89186584 ns     88922008 ns            8 Completed tasks=800k Rejected tasks=0 Total tasks=800k accepted tasks=800k consumer_items_per_second=1.12842M items_per_second=1.12124M/s producer_items_per_second=1.12918M
+BM_TaskSchedSharded/EmptyTask/100000/6/100000/real_time   95444793 ns     79407796 ns            8 Completed tasks=800k Rejected tasks=0 Total tasks=800k accepted tasks=800k consumer_items_per_second=1056.73k items_per_second=1047.73k/s producer_items_per_second=1059.78k
+BM_TaskSchedSharded/EmptyTask/100000/8/100000/real_time  123925818 ns     81101318 ns            5 Completed tasks=500k Rejected tasks=0 Total tasks=500k accepted tasks=500k consumer_items_per_second=812.61k items_per_second=806.934k/s producer_items_per_second=814.93k
+darshana@darshana-desktop:~/practice/Threadpool-lab-cpp$ 
+
+

@@ -1,0 +1,146 @@
+darshana@darshana-desktop:~/practice/Threadpool-lab-cpp$ sudo $(which perf) record ./run_bench-perf --benchmark_filter="BM_TaskSchedSharded/SmallTask/100000/1"
+2026-09-03T22:55:16+05:30
+------------------------------------------------------------------------------------------------------------------
+Benchmark                                                        Time             CPU   Iterations UserCounters...
+------------------------------------------------------------------------------------------------------------------
+BM_TaskSchedSharded/SmallTask/100000/1/100000/real_time  305905998 ns      5432128 ns            2 Completed tasks=200k Rejected tasks=0 Total tasks=200k accepted tasks=200k consumer_items_per_second=329.09k items_per_second=326.898k/s producer_items_per_second=26.4764M
+
+darshana@darshana-desktop:~/practice/Threadpool-lab-cpp$ sudo $(which perf) report
+#
+# Overhead  Command     Shared Object          Symbol                          >
+# ........  ..........  .....................  ................................>
+#
+    97.24%  TPWorker-0  run_bench-perf         [.] _Z9smallTaskv
+     0.62%  Bench-Main  run_bench-perf         [.] __aarch64_ldadd4_rel
+     0.36%  TPWorker-0  run_bench-perf         [.] __aarch64_ldadd4_relax
+     0.31%  TPWorker-0  run_bench-perf         [.] __aarch64_cas4_acq
+
+
+
+
+darshana@darshana-desktop:~/practice/Threadpool-lab-cpp$ sudo $(which perf) record ./run_bench-perf --benchmark_filter="BM_TaskSchedSharded/SmallTask/100000/2"
+2026-09-03T22:55:51+05:30
+------------------------------------------------------------------------------------------------------------------
+Benchmark                                                        Time             CPU   Iterations UserCounters...
+------------------------------------------------------------------------------------------------------------------
+BM_TaskSchedSharded/SmallTask/100000/2/100000/real_time  177978841 ns      8367344 ns            4 Completed tasks=400k Rejected tasks=0 Total tasks=400k accepted tasks=400k consumer_items_per_second=573.398k items_per_second=561.865k/s producer_items_per_second=18.9875M
+
+darshana@darshana-desktop:~/practice/Threadpool-lab-cpp$ sudo $(which perf) report
+#
+# Overhead  Command     Shared Object          Symbol                          >
+# ........  ..........  .....................  ................................>
+#
+    43.71%  TPWorker-0  run_bench-perf         [.] _Z9smallTaskv
+    43.30%  TPWorker-1  run_bench-perf         [.] _Z9smallTaskv
+     5.19%  TPWorker-1  run_bench-perf         [.] __aarch64_ldadd4_relax
+     4.71%  TPWorker-0  run_bench-perf         [.] __aarch64_ldadd4_relax
+     0.63%  Bench-Main  run_bench-perf         [.] __aarch64_ldadd4_rel
+     0.48%  TPWorker-0  run_bench-perf         [.] _ZN10ThreadPoolISt8functionI>
+     0.36%  TPWorker-1  run_bench-perf         [.] _ZN10ThreadPoolISt8functionI>
+     0.33%  Bench-Main  run_bench-perf         [.] _ZL19BM_TaskSchedShardedRN9b>
+     0.22%  TPWorker-1  run_bench-perf         [.] __aarch64_cas4_acq
+     0.18%  TPWorker-0  run_bench-perf         [.] __aarch64_cas4_acq
+     0.15%  Bench-Main  [kernel.kallsyms]      [k] __pi_clear_page
+     0.07%  run_bench-  [kernel.kallsyms]      [k] next_uptodate_page
+     0.07%  Bench-Main  run_bench-perf         [.] _ZN10ThreadPoolISt8functionI>
+     
+     
+     
+     
+darshana@darshana-desktop:~/practice/Threadpool-lab-cpp$ sudo $(which perf) record ./run_bench-perf --benchmark_filter="BM_TaskSchedSharded/SmallTask/100000/4"
+2026-09-03T22:56:27+05:30
+------------------------------------------------------------------------------------------------------------------
+Benchmark                                                        Time             CPU   Iterations UserCounters...
+------------------------------------------------------------------------------------------------------------------
+BM_TaskSchedSharded/SmallTask/100000/4/100000/real_time   94559926 ns      8457193 ns            7 Completed tasks=700k Rejected tasks=0 Total tasks=700k accepted tasks=700k consumer_items_per_second=1090.16k items_per_second=1057.53k/s producer_items_per_second=17.2314M
+
+darshana@darshana-desktop:~/practice/Threadpool-lab-cpp$ sudo $(which perf) report
+#
+# Overhead  Command     Shared Object          Symbol                          >
+# ........  ..........  .....................  ................................>
+#
+    21.95%  TPWorker-3  run_bench-perf         [.] _Z9smallTaskv
+    21.88%  TPWorker-2  run_bench-perf         [.] _Z9smallTaskv
+    21.82%  TPWorker-0  run_bench-perf         [.] _Z9smallTaskv
+    21.72%  TPWorker-1  run_bench-perf         [.] _Z9smallTaskv
+     2.42%  TPWorker-0  run_bench-perf         [.] __aarch64_ldadd4_relax
+     2.40%  TPWorker-1  run_bench-perf         [.] __aarch64_ldadd4_relax
+     2.26%  TPWorker-2  run_bench-perf         [.] __aarch64_ldadd4_relax
+     2.23%  TPWorker-3  run_bench-perf         [.] __aarch64_ldadd4_relax
+     0.79%  Bench-Main  run_bench-perf         [.] __aarch64_ldadd4_rel
+     0.41%  Bench-Main  run_bench-perf         [.] _ZL19BM_TaskSchedShardedRN9b>
+     0.36%  TPWorker-1  run_bench-perf         [.] __aarch64_cas4_acq
+     0.24%  TPWorker-2  run_bench-perf         [.] __aarch64_cas4_acq
+     
+     
+     
+     
+darshana@darshana-desktop:~/practice/Threadpool-lab-cpp$ sudo $(which perf) record ./run_bench-perf --benchmark_filter="BM_TaskSchedSharded/SmallTask/100000/6"
+2026-09-03T22:56:48+05:30
+------------------------------------------------------------------------------------------------------------------
+Benchmark                                                        Time             CPU   Iterations UserCounters...
+------------------------------------------------------------------------------------------------------------------
+BM_TaskSchedSharded/SmallTask/100000/6/100000/real_time   75805523 ns      7355725 ns           10 Completed tasks=1000k Rejected tasks=0 Total tasks=1000k accepted tasks=1000k consumer_items_per_second=1.3416M items_per_second=1.31917M/s producer_items_per_second=15.5969M
+
+darshana@darshana-desktop:~/practice/Threadpool-lab-cpp$ sudo $(which perf) report
+#
+# Overhead  Command     Shared Object          Symbol                          >
+# ........  ..........  .....................  ................................>
+#
+    14.86%  TPWorker-4  run_bench-perf         [.] _Z9smallTaskv
+    14.82%  TPWorker-0  run_bench-perf         [.] _Z9smallTaskv
+    14.67%  TPWorker-5  run_bench-perf         [.] _Z9smallTaskv
+    14.59%  TPWorker-1  run_bench-perf         [.] _Z9smallTaskv
+    14.54%  TPWorker-3  run_bench-perf         [.] _Z9smallTaskv
+    14.39%  TPWorker-2  run_bench-perf         [.] _Z9smallTaskv
+     1.78%  TPWorker-2  run_bench-perf         [.] __aarch64_ldadd4_relax
+     1.55%  TPWorker-3  run_bench-perf         [.] __aarch64_ldadd4_relax
+     1.52%  TPWorker-5  run_bench-perf         [.] __aarch64_ldadd4_relax
+     1.50%  TPWorker-1  run_bench-perf         [.] __aarch64_ldadd4_relax
+     1.34%  TPWorker-0  run_bench-perf         [.] __aarch64_ldadd4_relax
+     1.31%  TPWorker-4  run_bench-perf         [.] __aarch64_ldadd4_relax
+     1.02%  Bench-Main  run_bench-perf         [.] __aarch64_ldadd4_rel
+     0.39%  Bench-Main  run_bench-perf         [.] _ZL19BM_TaskSchedShardedRN9b>
+     0.20%  TPWorker-3  run_bench-perf         [.] _ZN10ThreadPoolISt8functionI>
+     0.12%  TPWorker-3  run_bench-perf         [.] __aarch64_cas4_acq
+     0.12%  TPWorker-1  run_bench-perf         [.] __aarch64_cas4_acq
+
+
+
+
+darshana@darshana-desktop:~/practice/Threadpool-lab-cpp$ sudo $(which perf) record ./run_bench-perf --benchmark_filter="BM_TaskSchedSharded/SmallTask/100000/8"
+2026-09-03T23:00:49+05:30
+------------------------------------------------------------------------------------------------------------------
+Benchmark                                                        Time             CPU   Iterations UserCounters...
+------------------------------------------------------------------------------------------------------------------
+BM_TaskSchedSharded/SmallTask/100000/8/100000/real_time   82616388 ns     11098318 ns            7 Completed tasks=700k Rejected tasks=0 Total tasks=700k accepted tasks=700k consumer_items_per_second=1.24116M items_per_second=1.21041M/s producer_items_per_second=6.04068M
+
+darshana@darshana-desktop:~/practice/Threadpool-lab-cpp$ sudo $(which perf) report
+#
+# Overhead  Command     Shared Object          Symbol                          >
+# ........  ..........  .....................  ................................>
+#
+    10.98%  TPWorker-4  run_bench-perf         [.] _Z9smallTaskv
+    10.96%  TPWorker-3  run_bench-perf         [.] _Z9smallTaskv
+    10.92%  TPWorker-0  run_bench-perf         [.] _Z9smallTaskv
+    10.89%  TPWorker-7  run_bench-perf         [.] _Z9smallTaskv
+    10.83%  TPWorker-6  run_bench-perf         [.] _Z9smallTaskv
+    10.77%  TPWorker-2  run_bench-perf         [.] _Z9smallTaskv
+    10.76%  TPWorker-1  run_bench-perf         [.] _Z9smallTaskv
+    10.75%  TPWorker-5  run_bench-perf         [.] _Z9smallTaskv
+     1.27%  Bench-Main  run_bench-perf         [.] __aarch64_ldadd4_rel
+     1.21%  TPWorker-2  run_bench-perf         [.] __aarch64_ldadd4_relax
+     1.13%  TPWorker-5  run_bench-perf         [.] __aarch64_ldadd4_relax
+     1.09%  TPWorker-1  run_bench-perf         [.] __aarch64_ldadd4_relax
+     1.02%  TPWorker-7  run_bench-perf         [.] __aarch64_ldadd4_relax
+     0.94%  TPWorker-0  run_bench-perf         [.] __aarch64_ldadd4_relax
+     0.93%  TPWorker-3  run_bench-perf         [.] __aarch64_ldadd4_relax
+     0.92%  TPWorker-4  run_bench-perf         [.] __aarch64_ldadd4_relax
+     0.92%  TPWorker-6  run_bench-perf         [.] __aarch64_ldadd4_relax
+     0.56%  Bench-Main  run_bench-perf         [.] _ZL19BM_TaskSchedShardedRN9b>
+     0.14%  TPWorker-0  run_bench-perf         [.] _ZN10ThreadPoolISt8functionI>
+     0.12%  TPWorker-1  run_bench-perf         [.] _ZN10ThreadPoolISt8functionI>
+
+
+
+
