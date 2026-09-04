@@ -4,7 +4,6 @@
 #include <atomic>
 #include <iostream>
 #include <vector>
-#include <semaphore>
 #include <climits>
 #include <cassert>
 #include <utility>
@@ -16,11 +15,12 @@
 //#include "queue/concurrent_queue.hpp"
 #include "./instrumentation/tracing.hpp"
 //#include "queue/SPMC_locked/spmc_queue.hpp"
-#include "queue/SPSC_queue/spsc_lockfree.hpp"
+#include "queue/SPSC_queue/notifying_spsc_queue.hpp"
 
 static constexpr std::size_t CREATED = 0;
 static constexpr std::size_t RUNNING = 1;
-static constexpr std::size_t STOPPED = 2;
+static constexpr std::size_t STOPPING = 2;
+static constexpr std::size_t STOPPED = 3;
 
 template <typename Task>
 class ThreadPool
@@ -31,15 +31,13 @@ private:
     
     // per-worker queue specific 
     QueueTopology queue_type_;
-  	std::vector<std::unique_ptr<SPSCQueue<Task>>> worker_queues_;
-    std::vector<std::unique_ptr<std::counting_semaphore<INT_MAX>>> work_;
+  	std::vector<std::unique_ptr<NotifSPSCQueue<Task>>> worker_queues_;
     std::size_t next_worker_;
     
     
     // thread pool state related
     std::atomic<unsigned int> completed_tasks_;
     std::atomic<bool> stop_requested_;
-    std::atomic<bool> threadpool_stopped_;
     std::atomic<std::size_t> pool_state_;
      
     std::vector<std::thread> worker_threads_;
@@ -82,6 +80,18 @@ public:
     
     // Destructor
     ~ThreadPool();
+    
+    
+    /** API contracts:
+    * launchWorkers and stopPool must be called on the same thread,
+    * launchworkers-stopPool concurrency is currently unsafe
+    *
+    * Constructor-> launchWorkers -> stopPool ->Desctructor must be called on same thread,
+    * concurrency between these functions is not tolerated, 
+    * as they represent sequential lifecycle of the threadpool
+    *
+    *
+    */ 
 };
 
 
@@ -94,7 +104,6 @@ ThreadPool<Task>::ThreadPool(std::size_t task_capacity,
 					next_worker_(0),
 					completed_tasks_(0),
 					stop_requested_(false),
-					threadpool_stopped_(false),
 					pool_state_(CREATED)			
 {
 
@@ -103,14 +112,12 @@ ThreadPool<Task>::ThreadPool(std::size_t task_capacity,
 	std::size_t leftover = pool_capacity_ % max_workers_;
 	
 	worker_queues_.reserve(max_workers_);	
-	work_.reserve(max_workers_);	
 	
 	for (std::size_t worker = 0; worker < max_workers_; worker++)
 	{
 		std::size_t per_queue_capacity = perworker_capacity 
 									+ ((worker < leftover)?1:0);
-		worker_queues_.push_back(std::make_unique<SPSCQueue<Task>>(per_queue_capacity));
-		work_.push_back(std::make_unique<std::counting_semaphore<INT_MAX>>(0));
+		worker_queues_.push_back(std::make_unique<NotifSPSCQueue<Task>>(per_queue_capacity));
 	}
 }
 
@@ -150,11 +157,7 @@ bool ThreadPool<Task>::taskSubmit(Task& task)
 	// possible race where task can still submit after stop requested
     if (!stop_requested_.load(std::memory_order_acquire)  )
     {
-    	if (worker_queues_[worker]->tryPush(task))
- 		{
-    		work_[worker]->release();
-    		return true;
-    	}
+    	return  (worker_queues_[worker]->tryPush(task));
     }
     	
     return false;
@@ -170,32 +173,37 @@ bool ThreadPool<Task>::taskSubmit(Task&& task)
 	// possible race where task can still submit after stop requested
     if (!stop_requested_.load(std::memory_order_acquire) ) 
     {
-    	if (worker_queues_[worker]->tryPush(std::move(task)) )
-    	{
-    		work_[worker]->release();
-    		return true;
-    	}
+    	return (worker_queues_[worker]->tryPush(std::move(task)) );
     }
     
 	return false;
 }
 
-// shutdown the threadpool gracefully on request
+// shutdown the threadpool gracefully on request, not expecting concurrency 
 template<typename Task>
 void ThreadPool<Task>::stopPool()
-{
-	if (threadpool_stopped_.load(std::memory_order_acquire))
+{		
+	std::size_t state = pool_state_.load(std::memory_order_acquire);
+	
+	if (state == STOPPED)
 		return;
-		
+	
 	// notify threadpool to stop accepting new work
 	stop_requested_.store(true, std::memory_order_release);
 	
-	if (pool_state_.load(std::memory_order_acquire) == RUNNING)
+	if (state == CREATED)
+	{
+		pool_state_.store(STOPPED,std::memory_order_release);
+		return;
+	}
+
+	std::size_t expected = RUNNING;
+	if(pool_state_.compare_exchange_strong(expected,STOPPING, std::memory_order_seq_cst))
 	{
 		
 		// Notify all worker threads to wake up and return now as queue is empty
-		for (std::size_t worker=0; worker<max_workers_; worker++)
-			work_[worker]->release();
+		for (std::size_t worker_id=0; worker_id<max_workers_; worker_id++)
+			worker_queues_[worker_id]->notifyShutdown();
 			
 		// Join all worker threads
 		for (auto &worker : worker_threads_)
@@ -203,21 +211,16 @@ void ThreadPool<Task>::stopPool()
 			if (worker.joinable())
 				worker.join();
 		}
+		
+		pool_state_.store(STOPPED,std::memory_order_release);
 	}	
-	
-	threadpool_stopped_.store(true,std::memory_order_release);
-	
-	pool_state_.store(STOPPED,std::memory_order_release);
-	
 }
 
 
 template<typename Task>
 ThreadPool<Task>::~ThreadPool()
 {	
-    // Stop the pool if pool is still running
-    if(!threadpool_stopped_.load(std::memory_order_acquire))
-    	stopPool();
+	stopPool();
 }
 
 
@@ -227,24 +230,20 @@ void ThreadPool<Task>::startWorkerThread(std::size_t worker_id) noexcept
 {
     Task task;
     
-    auto& task_queue_ = *worker_queues_[worker_id];
-    auto& work_items_ = *work_[worker_id];
+    auto& local_queue_ = *worker_queues_[worker_id];
     
     // keep polling for new tasks on this thread
     while (true)
     {
-        // Wait until there is a task in the queue
-		work_items_.acquire();
-
 		// return only if pool is stopped and all tasks are completed
 		if (stop_requested_.load(std::memory_order_acquire))
 		{
-			if(task_queue_.empty())
+			if(local_queue_.empty())
 				goto stop_worker;		
 		}
 			
         // Pop a task from the queue to attach to current worker thread
-        if ( !task_queue_.tryPop(task) )
+        if ( !local_queue_.tryPop(task) )
         {
         	// pop failure due to queue empty is only ok during pool termination
         	if (stop_requested_.load(std::memory_order_acquire))

@@ -36,6 +36,28 @@ void testBasicExecution(int queue_size, int num_workers, int numtasks)
 	assert(submitted == tasks_executed);
 }
 
+void testNoLaunchExecution(int queue_size, int num_workers, int numtasks)
+{
+	assert(queue_size > 0 );
+	std::atomic<int> submitted{0};
+	std::atomic<int> tasks_executed{0};
+	//int tasks_executed =0;
+	
+	// force threadpool lifetime complete before assert, otherwise assert might be fired before all thread complete and join
+	{
+		ThreadPool<Task> thread_pool(queue_size,num_workers);
+		//thread_pool.launchWorkers();
+
+		for (int task =0; task<numtasks; task++)
+		{
+			if ( thread_pool.taskSubmit([&tasks_executed](){ tasks_executed++; }))
+				submitted++;
+		}
+	}
+	assert(submitted == numtasks);
+	assert(0 == tasks_executed);
+}
+
 
 /** Test: Reject after shutdown
 	Verifires - no new task is accepted after stopPool() is called
@@ -216,6 +238,10 @@ int main(int argc, char** argv)
 	testBasicExecution(queue_size,workers,numtasks);
 	
 	std::cout << "[PASS] Basic execution" << std::endl;
+	
+	testNoLaunchExecution(queue_size,workers,numtasks);
+	
+	std::cout << "[PASS] Lauchless execution" << std::endl;
 	
 //	testQueueCapacity(queue_size,numtasks + 100);
 	
