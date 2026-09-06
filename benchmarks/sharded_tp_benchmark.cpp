@@ -58,7 +58,7 @@ static void BM_TaskSchedSharded(benchmark::State& state, Task workload)
 	for (auto _ : state)
 	{
 		// Construct threadpool
-		ThreadPool<Task> thread_pool(queue_size,num_workers);
+		ThreadPool<Task,ShardedWorkCoordinator<Task>> thread_pool(queue_size,num_workers);
 		
 		// start workers 
 		thread_pool.launchWorkers();
