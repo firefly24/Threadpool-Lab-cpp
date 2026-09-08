@@ -13,6 +13,8 @@
 #include <string>
 #include <cstddef>
 #include <memory>
+#include <concepts>
+#include <functional>
 
 #include "./instrumentation/tracing.hpp"
 #include "coordinator/sharded_work_coordinator.hpp"
@@ -25,7 +27,12 @@ enum class PoolState{
 	STOPPED
 };
 
-template <typename Task, typename Coordinator>
+template <typename T>
+concept ExecutableTask = std::default_initializable<T>
+					  && std::move_constructible<T>
+					  && std::invocable<T>;
+
+template <ExecutableTask Task, typename Coordinator>
 class ThreadPool
 {
 private:
@@ -52,6 +59,9 @@ private:
     // Disable moving
     ThreadPool(ThreadPool &&) = delete;
     ThreadPool &operator=(ThreadPool &&) = delete;
+    
+    // Launch all worker threads, can be launched only once in a threadpool object lifetime
+    bool launchWorkers();
 
     // Worker thread function to pop tasks from the queue and execute them
     void runWorker(std::size_t worker_id) noexcept;
@@ -67,8 +77,7 @@ public:
         return completed_tasks_.load(std::memory_order_relaxed);
     }
     
-    // External interface to Launch all worker threads manually, can be launched only once in a threadpool object lifetime
-    bool launchWorkers();
+    
     
     // lvalue overload- for Fire and forget tasks with no return value
     bool taskSubmit(Task& task);
@@ -104,7 +113,7 @@ public:
 };
 
 
-template<typename Task, typename Coordinator>
+template<ExecutableTask Task, typename Coordinator>
 ThreadPool<Task,Coordinator>::ThreadPool(std::size_t task_capacity, 
 										std::size_t max_workers) :
 												max_workers_(max_workers),
@@ -116,13 +125,13 @@ ThreadPool<Task,Coordinator>::ThreadPool(std::size_t task_capacity,
 
 	// TODO: Initializing any WorkCoordinator related mechanisms
 	
-	
+	launchWorkers();
 	
 	//pool_state_.store(PoolState::INITIALIZED)
 }
 
 
-template<typename Task, typename Coordinator>
+template<ExecutableTask Task, typename Coordinator>
 bool ThreadPool<Task,Coordinator>::launchWorkers()
 {
 	enum PoolState expected = PoolState::CREATED;
@@ -155,7 +164,7 @@ bool ThreadPool<Task,Coordinator>::launchWorkers()
 }
 
 
-template<typename Task, typename Coordinator>
+template<ExecutableTask Task, typename Coordinator>
 bool ThreadPool<Task,Coordinator>::taskSubmit(Task& task)
 {
 	if( stop_requested_.load(std::memory_order_acquire)  )
@@ -165,7 +174,7 @@ bool ThreadPool<Task,Coordinator>::taskSubmit(Task& task)
 }
 
 
-template<typename Task, typename Coordinator>
+template<ExecutableTask Task, typename Coordinator>
 bool ThreadPool<Task,Coordinator>::taskSubmit(Task&& task)
 {
 	if( stop_requested_.load(std::memory_order_acquire) )  
@@ -177,7 +186,7 @@ bool ThreadPool<Task,Coordinator>::taskSubmit(Task&& task)
 
 
 // shutdown the threadpool gracefully on request, not expecting concurrency 
-template<typename Task, typename Coordinator>
+template<ExecutableTask Task, typename Coordinator>
 void ThreadPool<Task,Coordinator>::stopPool()
 {		
 	enum PoolState state = pool_state_.load(std::memory_order_acquire);
@@ -215,18 +224,25 @@ void ThreadPool<Task,Coordinator>::stopPool()
 	}	
 }
 
-template<typename Task, typename Coordinator>
+template<ExecutableTask Task, typename Coordinator>
 ThreadPool<Task,Coordinator>::~ThreadPool()
 {	
 	stopPool();
 }
 
 // Worker thread function to pop tasks from the queue and execute them
-template<typename Task, typename Coordinator>
+template<ExecutableTask Task, typename Coordinator>
 void ThreadPool<Task,Coordinator>::runWorker(std::size_t worker_id) noexcept
 {
 	// NOTE: currently valid for 1 task only, redesign later for mult-tasks
-    Task work_buff;
+    std::vector<Task> work_buff;
+    
+    // set a contract with Coordinator for task batch 
+    std::size_t max_batch = 6;
+    work_buff.reserve(max_batch);
+    std::size_t task_id = 0;
+    
+    coordinator_.setWorkerBatchSize(worker_id, max_batch);
     
     // keep polling for new tasks on this thread
     while (true)
@@ -237,14 +253,15 @@ void ThreadPool<Task,Coordinator>::runWorker(std::size_t worker_id) noexcept
 		// count = 0 iff threadpool has requested shutdown and all queues work has drained
 		if (!task_count)
 			goto stop_worker;
-			
+		
+		task_id = 0;
 		while(task_count--)
 		{
 			// Execute the task
         	try
         	{
         		TP_TRACE_EVENT("ExecuteTask");
-            	work_buff();
+            	(work_buff[task_id++])();
         	}
         	catch (...)
         	{
@@ -253,6 +270,8 @@ void ThreadPool<Task,Coordinator>::runWorker(std::size_t worker_id) noexcept
 			
 			completed_tasks_.fetch_add(1,std::memory_order_relaxed);
 		}
+		
+		//work_buff.clear();
     }
 stop_worker:
 	//I want to retain this label as a single point in case any post exit cleanup needed later

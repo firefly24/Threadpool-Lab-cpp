@@ -24,7 +24,7 @@ void testBasicExecution(int queue_size, int num_workers, int numtasks)
 	// force threadpool lifetime complete before assert, otherwise assert might be fired before all thread complete and join
 	{
 		ThreadPool<Task,ShardedWorkCoordinator<Task>> thread_pool(queue_size,num_workers);
-		thread_pool.launchWorkers();
+		//thread_pool.launchWorkers();
 
 		for (int task =0; task<numtasks; task++)
 		{
@@ -72,7 +72,7 @@ void testRejectAfterShutdown (int queue_size, int num_workers, int numtasks)
 	
 	{
 		ThreadPool<Task,ShardedWorkCoordinator<Task>> thread_pool(queue_size, num_workers);
-		thread_pool.launchWorkers();
+		//thread_pool.launchWorkers();
 		
 		thread_pool.stopPool();
 		
@@ -161,7 +161,7 @@ void testMultipleWorkers(int num_workers, int num_tasks)
 	
 	{
 		ThreadPool<Task,ShardedWorkCoordinator<Task>> thread_pool(queue_size, num_workers);
-		thread_pool.launchWorkers();
+		//thread_pool.launchWorkers();
 		
 		for (int task =0; task<num_tasks; task++)
 		{
@@ -199,7 +199,7 @@ void testGracefulShutdown (int queue_size, int num_workers, int numtasks)
 	
 	{
 		ThreadPool<Task,ShardedWorkCoordinator<Task>> thread_pool(queue_size, num_workers);
-		thread_pool.launchWorkers();
+		//thread_pool.launchWorkers();
 		
 		std::thread producer([&](){
 									for (int task =0; task<numtasks; task++)
@@ -239,9 +239,9 @@ int main(int argc, char** argv)
 	
 	std::cout << "[PASS] Basic execution" << std::endl;
 	
-	testNoLaunchExecution(queue_size,workers,numtasks);
+//	testNoLaunchExecution(queue_size,workers,numtasks);
 	
-	std::cout << "[PASS] Lauchless execution" << std::endl;
+//	std::cout << "[PASS] Lauchless execution" << std::endl;
 	
 //	testQueueCapacity(queue_size,numtasks + 100);
 	
