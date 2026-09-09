@@ -18,12 +18,12 @@ template <typename Task>
 struct SPSCShard
 {
 	SPSCQueue<Task> queue_;							// queue storage
-	std::counting_semaphore<INT_MAX> new_work_;		// work permits for consuming work 
+	//std::counting_semaphore<INT_MAX> new_work_;		// work permits for consuming work 
 	//std::size_t batch_size_;
+	std::atomic<std::size_t> has_work_;
 	
 	explicit SPSCShard(std::size_t capacity):queue_(capacity),
-											 new_work_(0)//,
-											 //batch_size_(1)
+											 has_work_(0)
 											
 	{
 	
@@ -51,6 +51,9 @@ private:
 	
 	// routing state, non-atomic as we're expecting only single producer to increment it sequentially
 	std::size_t next_worker_;
+	
+	std::size_t producer_batch_size;
+	
 	std::vector<std::size_t> worker_batch_size_;
 	
 	// TODO: Define shared drain state - will it be per-shard or global ? 
@@ -109,9 +112,11 @@ public:
 	bool submit(Task &&task);
 	bool submit(Task &task);
 	
+	bool submitBatch(std::vector<Task> tasks, std::size_t batch_size);
+	
 	void setWorkerBatchSize(std::size_t worker_id,std::size_t max_batch);
 	
-	std::size_t acquireWorkBlocking(std::size_t worker_id, std::vector<Task>& out_buffer);
+	std::size_t acquireWorkBlocking(std::size_t worker_id /*, std::vector<Task>& out_buffer*/ );
 	
 	void wakeAllWorkers();
 };
@@ -129,44 +134,35 @@ ShardedWorkCoordinator<Task>::ShardedWorkCoordinator(std::size_t task_capacity,
 
 
 template <typename Task>
-std::size_t ShardedWorkCoordinator<Task>::acquireWorkBlocking(std::size_t worker_id,
-															  std::vector<Task>& out_buffer)
+std::size_t ShardedWorkCoordinator<Task>::acquireWorkBlocking(std::size_t worker_id
+															/*,std::vector<Task>& out_buffer*/)
 {
 	// reason why Task default_initializable constraint required
 	Task task;
-	std::size_t tasks_acquired = 0;
-	std::size_t permits =0;
+	std::size_t tasks_executed = 0;
 	
-	// if shard has no work, block 
-	work_queues_[worker_id]->new_work_.acquire();
-	permits =1;
+	SPSCShard<Task>& local_shard = *work_queues_[worker_id];
+
+	local_shard.has_work_.wait(0, std::memory_order_acquire);
 	
-	// Take more permits optimisitically 
-	while( (permits < worker_batch_size_[worker_id]) 
-		  && (work_queues_[worker_id]->new_work_.try_acquire()) )
-		permits++;
-	
-	while (permits--) 
-	{
-		if ( !(work_queues_[worker_id]->queue_).tryPop(task) )
-		{	 
-			//re-release token, if (current task_count !=0 )
-			// so that tryPop will fail due to emptyQueue in next call
-			if (tasks_acquired)
-				work_queues_[worker_id]->new_work_.release();
-			
-			break;
-		}
-		else
+	while( (work_queues_[worker_id]->queue_).tryPop(task) )
+	{	
+		// Execute the task
+		try
 		{
-			out_buffer.push_back(std::move(task));
-			tasks_acquired++;
+			TP_TRACE_EVENT("ExecuteTask");
+    		task();
+    		//local_shard.has_work_.fetch_sub(1, std::memory_order_relaxed);
 		}
+		catch (...)
+		{
+    		std::cerr << "Task thown exception" << std::endl;
+		}
+		tasks_executed++; 
 	}
-	// tryPop must only fail when queue is completely drained for shutdown		
-
-	return tasks_acquired;
-
+	local_shard.has_work_.fetch_sub(tasks_executed,std::memory_order_release);
+	
+	return tasks_executed;
 }
 
 
@@ -178,12 +174,11 @@ bool ShardedWorkCoordinator<Task>::submit(Task& task)
 	// choose shard
 	std::size_t shard = next_worker_;
 	 
-	 
 	// attempt admission to that shard
 	if ( (ret = work_queues_[shard]->queue_.tryPush(task)) )
 	{
-		// if accepted, signal notify on that shard
-		work_queues_[shard]->new_work_.release();
+		work_queues_[shard]->has_work_.fetch_add(1,std::memory_order_release);
+		work_queues_[shard]->has_work_.notify_one();
 	}
 	
 	// Update routing state
@@ -204,8 +199,8 @@ bool ShardedWorkCoordinator<Task>::submit(Task&& task)
 	// attempt admission to that shard
 	if ( (ret = work_queues_[shard]->queue_.tryPush(std::move(task))) )
 	{
-		// if accepted, signal notify on that shard
-		work_queues_[shard]->new_work_.release();
+		work_queues_[shard]->has_work_.fetch_add(1,std::memory_order_release);
+		work_queues_[shard]->has_work_.notify_one();
 	}
 	
 	// Update routing state
@@ -215,13 +210,56 @@ bool ShardedWorkCoordinator<Task>::submit(Task&& task)
 	return ret;
 }
 
+template <typename Task>
+bool ShardedWorkCoordinator<Task>::submitBatch(std::vector<Task> tasks, std::size_t batch_size)
+{
+	bool ret = false;
+	std::size_t idx = 0;
+		
+	// choose shard
+	std::size_t shard = next_worker_;
+	
+	assert(batch_size <= tasks.size());
+	
+	while(shard == next_worker_)
+	{
+		SPSCShard<Task>& local_shard = *work_queues_[shard];
+		
+		while( idx < batch_size)
+		{
+			// attempt admission to that shard
+			if (  work_queues_[shard]->queue_.tryPush(tasks[idx]) )
+			{
+				idx++;
+				local_shard.has_work_.fetch_add(1,std::memory_order_release);
+				//local_shard.has_work_.notify_one();
+			}
+			else
+			{
+				advanceShard();
+				shard = next_worker_;
+			}
+		}
+		local_shard.has_work_.notify_one();
+		
+		if(idx == batch_size)
+		{
+			advanceShard();
+			break;
+		}
+	}	
+	return true;
+}
+
 
 template <typename Task>
 void ShardedWorkCoordinator<Task>::wakeAllWorkers()
 {
 	for (std::size_t shard = 0; shard < max_workers_; shard++)
 	{									
-			(work_queues_[shard]->new_work_).release();
+			//(work_queues_[shard]->new_work_).release();
+			work_queues_[shard]->has_work_.fetch_add(1,std::memory_order_release);
+			work_queues_[shard]->has_work_.notify_one();
 	}
 
 }
