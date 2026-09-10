@@ -51,8 +51,6 @@ private:
     
     // Worker threads
     std::vector<std::thread> worker_threads_;
-    
-    std::thread producer_;
    
     // Disable copying
     ThreadPool(const ThreadPool &) = delete;
@@ -86,8 +84,6 @@ public:
     
     // rvalue overload- for Fire and forget tasks with no return value
     bool taskSubmit(Task&& task);
-    
-    bool taskSubmitBatch(std::vector<Task> tasks, std::size_t batch_size);
     
     // stopPool will only be used for graceful shutdown, it is idempotent
     void stopPool();
@@ -187,15 +183,6 @@ bool ThreadPool<Task,Coordinator>::taskSubmit(Task&& task)
 	return coordinator_.submit(std::move(task));
 }
 
-template<ExecutableTask Task, typename Coordinator>
-bool ThreadPool<Task,Coordinator>::taskSubmitBatch(std::vector<Task> tasks, std::size_t batch_size)
-{
-	if( stop_requested_.load(std::memory_order_acquire) )  
-		return false;
-	
-	return coordinator_.submitBatch(std::move(tasks),batch_size);		
-
-}
 
 
 // shutdown the threadpool gracefully on request, not expecting concurrency 
@@ -247,16 +234,44 @@ ThreadPool<Task,Coordinator>::~ThreadPool()
 template<ExecutableTask Task, typename Coordinator>
 void ThreadPool<Task,Coordinator>::runWorker(std::size_t worker_id) noexcept
 {
+	// NOTE: currently valid for 1 task only, redesign later for mult-tasks
+    std::vector<Task> work_buff;
+    
+    // set a contract with Coordinator for task batch 
+    std::size_t max_batch = 6;
+    work_buff.reserve(max_batch);
+    std::size_t task_id = 0;
+    
+    coordinator_.setWorkerBatchSize(worker_id, max_batch);
     
     // keep polling for new tasks on this thread
     while (true)
     {
     	// blocks until coordinator returns work
-    	std::size_t task_count = coordinator_.acquireWorkBlocking(worker_id/*, work_buff */ );
+    	std::size_t task_count = coordinator_.acquireWorkBlocking(worker_id, work_buff );
 		
 		// count = 0 iff threadpool has requested shutdown and all queues work has drained
 		if (!task_count)
 			goto stop_worker;
+		
+		task_id = 0;
+		while(task_count--)
+		{
+			// Execute the task
+        	try
+        	{
+        		TP_TRACE_EVENT("ExecuteTask");
+            	(work_buff[task_id++])();
+        	}
+        	catch (...)
+        	{
+            	std::cerr << "Task thown exception" << std::endl;
+        	}
+			
+			completed_tasks_.fetch_add(1,std::memory_order_relaxed);
+		}
+		
+		//work_buff.clear();
     }
 stop_worker:
 	//I want to retain this label as a single point in case any post exit cleanup needed later

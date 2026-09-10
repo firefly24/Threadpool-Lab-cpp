@@ -62,32 +62,16 @@ static void BM_TaskSchedSharded(benchmark::State& state, Task workload)
 		
 		// start workers 
 		//thread_pool.launchWorkers();
-		std::size_t batch_size = 128;
-		std::vector<Task> work_buf;
-		work_buf.reserve(batch_size);
 		
 		auto consumer_start = std::chrono::steady_clock::now();
 		auto producer_start = std::chrono::steady_clock::now();
 		{
 			TP_TRACE_EVENT("ProducerBatchSubmit");
-			std::size_t task =0;
-			for(task=0; task<num_tasks ; task++)
+			for(std::size_t task=0; task<num_tasks ; task++)
 			{
-				work_buf.push_back(workload);
-				
-				if ( (task%batch_size) == (batch_size-1) )
-				{
-					rejected_tasks += !(thread_pool.taskSubmitBatch(std::move(work_buf),batch_size));
-					work_buf.clear();
-				}
 				// submit tasks
-				//if (!thread_pool.taskSubmit(workload))
-				//	rejected_tasks++;
-			}
-			if (work_buf.size())
-			{
-				rejected_tasks += !(thread_pool.taskSubmitBatch(work_buf,work_buf.size()));
-				work_buf.clear();
+				if (!thread_pool.taskSubmit(workload))
+					rejected_tasks++;
 			}
 		}
 		auto producer_end = std::chrono::steady_clock::now();
@@ -109,10 +93,8 @@ static void BM_TaskSchedSharded(benchmark::State& state, Task workload)
 		total_tasks += num_tasks;
 		
 		// Update benchmark of completed tasks
-		//completed_tasks += thread_pool.completedTaskCount();
+		completed_tasks += thread_pool.completedTaskCount();
 	}
-	
-	completed_tasks  = total_tasks;
 	
 	double producer_duration = std::chrono::duration<double>(total_producer_time).count();
 	double consumer_duration = std::chrono::duration<double>(total_consumer_time).count();
@@ -133,7 +115,6 @@ static void BM_TaskSchedSharded(benchmark::State& state, Task workload)
 	
 }
 
-
 BENCHMARK_CAPTURE( BM_TaskSchedSharded,	// benchmarking function
 					EmptyTask, 			// label for output
 					Task(emptyTask)		// Workload for benchmarking
@@ -142,9 +123,7 @@ BENCHMARK_CAPTURE( BM_TaskSchedSharded,	// benchmarking function
 								{1,2,4,6,8},
 								{100000},
 							   })->UseRealTime();
-
-
-				
+ 				
 BENCHMARK_CAPTURE( BM_TaskSchedSharded,	// benchmarking function
 					SmallTask, 			// label for output
 					Task(smallTask)		// Workload for benchmarking
@@ -153,7 +132,7 @@ BENCHMARK_CAPTURE( BM_TaskSchedSharded,	// benchmarking function
 								{1,2,4,6,8},
 								{100000},
 							   })->UseRealTime();
-		
+			
 BENCHMARK_CAPTURE( BM_TaskSchedSharded,	// benchmarking function
 					MediumTask, 			// label for output
 					Task(mediumTask)		// Workload for benchmarking
