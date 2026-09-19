@@ -13,6 +13,7 @@
 
 // TODO : include headers for QueueContainer and QueueTopology
 #include "../queue/SPSC_queue/spsc_lockfree.hpp"
+#include "../policies/routing_strategies.hpp"
 
 template <typename Task>
 struct SPSCShard
@@ -39,7 +40,7 @@ struct SPSCShard
 
 
 
-template <typename Task>
+template <typename Task, typename RoutingStrategy>
 class ShardedWorkCoordinator
 {
 
@@ -50,11 +51,12 @@ private:
 	std::vector<std::unique_ptr<SPSCShard<Task>>> work_queues_;
 	
 	// routing state, non-atomic as we're expecting only single producer to increment it sequentially
-	std::size_t next_worker_;
+	//std::size_t next_worker_;
 	
 	// TODO: Define shared drain state - will it be per-shard or global ? 
 	
 	// TODO: define task routing state
+	RoutingStrategy routing_;
 	
 	// TODO: define signalling state object/policy
 	
@@ -85,11 +87,6 @@ private:
 		}
 	}
 	
-	
-	void advanceShard()
-	{
-		next_worker_ = (next_worker_ + 1)% max_workers_;
-	}
 
 public:
 
@@ -114,18 +111,18 @@ public:
 };
 
 
-template <typename Task>
-ShardedWorkCoordinator<Task>::ShardedWorkCoordinator(std::size_t task_capacity, 
+template <typename Task, typename RoutingStrategy>
+ShardedWorkCoordinator<Task,RoutingStrategy>::ShardedWorkCoordinator(std::size_t task_capacity, 
 													 std::size_t max_workers ) :
 														max_workers_(max_workers),
-														next_worker_(0)
+														routing_(max_workers)
 {
 		createQueueShards(task_capacity);
 }
 
 
-template <typename Task>
-bool ShardedWorkCoordinator<Task>::acquireWorkBlocking(std::size_t worker_id,
+template <typename Task, typename RoutingStrategy>
+bool ShardedWorkCoordinator<Task,RoutingStrategy>::acquireWorkBlocking(std::size_t worker_id,
 															  Task& out)
 {
 	// reason why Task default_initializable constraint required
@@ -140,54 +137,43 @@ bool ShardedWorkCoordinator<Task>::acquireWorkBlocking(std::size_t worker_id,
 }
 
 
-template <typename Task>
-bool ShardedWorkCoordinator<Task>::submit(Task& task)
+template <typename Task, typename RoutingStrategy>
+bool ShardedWorkCoordinator<Task,RoutingStrategy>::submit(Task& task)
 {
-	bool ret = false;
-	
 	// choose shard
-	std::size_t shard = next_worker_;
-	 
+	std::size_t shard = routing_.nextShard(); 
 	 
 	// attempt admission to that shard
-	if ( (ret = work_queues_[shard]->queue_.tryPush(task)) )
+	if ( work_queues_[shard]->queue_.tryPush(task) )
 	{
 		// if accepted, signal notify on that shard
 		work_queues_[shard]->new_work_.release();
+		return true;
 	}
-	
-	// Update routing state
-	advanceShard();
-	
-	// return accepted/ rejected
-	return ret;
+
+	return false;
 }
 
-template <typename Task>
-bool ShardedWorkCoordinator<Task>::submit(Task&& task)
+template <typename Task, typename RoutingStrategy>
+bool ShardedWorkCoordinator<Task,RoutingStrategy>::submit(Task&& task)
 {
-	bool ret = false;
-	
 	// choose shard
-	std::size_t shard = next_worker_;
+	std::size_t shard = routing_.nextShard();
 	
 	// attempt admission to that shard
-	if ( (ret = work_queues_[shard]->queue_.tryPush(std::move(task))) )
+	if ( work_queues_[shard]->queue_.tryPush(std::move(task)) )
 	{
 		// if accepted, signal notify on that shard
 		work_queues_[shard]->new_work_.release();
+		return true;
 	}
 	
-	// Update routing state
-	advanceShard();
-	
-	// return accepted/ rejected
-	return ret;
+	return false;
 }
 
 
-template <typename Task>
-void ShardedWorkCoordinator<Task>::notifyDrain()
+template <typename Task, typename RoutingStrategy>
+void ShardedWorkCoordinator<Task,RoutingStrategy>::notifyDrain()
 {
 	for (std::size_t shard = 0; shard < max_workers_; shard++)
 	{									

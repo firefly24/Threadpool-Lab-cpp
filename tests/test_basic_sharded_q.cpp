@@ -5,6 +5,7 @@
 #include "threadpool/thread_pool.hpp"
 
 using Task = std::function<void()>;
+using ShardedWorkCoordinatorRouted = ShardedWorkCoordinator<Task,ChunkyRoundRobinRouting<16>> ;
 
 static constexpr std::size_t default_batch_size = 1;
 
@@ -23,7 +24,7 @@ void testBasicExecution(int queue_size, int num_workers, int numtasks)
 	
 	// force threadpool lifetime complete before assert, otherwise assert might be fired before all thread complete and join
 	{
-		ThreadPool<Task,ShardedWorkCoordinator<Task>> thread_pool(queue_size,num_workers);
+		ThreadPool<Task,ShardedWorkCoordinatorRouted> thread_pool(queue_size,num_workers);
 		//thread_pool.launchWorkers();
 
 		for (int task =0; task<numtasks; task++)
@@ -45,7 +46,7 @@ void testNoLaunchExecution(int queue_size, int num_workers, int numtasks)
 	
 	// force threadpool lifetime complete before assert, otherwise assert might be fired before all thread complete and join
 	{
-		ThreadPool<Task,ShardedWorkCoordinator<Task>> thread_pool(queue_size,num_workers);
+		ThreadPool<Task,ShardedWorkCoordinatorRouted> thread_pool(queue_size,num_workers);
 		//thread_pool.launchWorkers();
 
 		for (int task =0; task<numtasks; task++)
@@ -71,7 +72,7 @@ void testRejectAfterShutdown (int queue_size, int num_workers, int numtasks)
 	std::atomic<int> tasks_accepted{0};
 	
 	{
-		ThreadPool<Task,ShardedWorkCoordinator<Task>> thread_pool(queue_size, num_workers);
+		ThreadPool<Task,ShardedWorkCoordinatorRouted> thread_pool(queue_size, num_workers);
 		//thread_pool.launchWorkers();
 		
 		thread_pool.stopPool();
@@ -160,7 +161,7 @@ void testMultipleWorkers(int num_workers, int num_tasks)
 	auto task_func = [&tasks_executed](){ tasks_executed++; };
 	
 	{
-		ThreadPool<Task,ShardedWorkCoordinator<Task>> thread_pool(queue_size, num_workers);
+		ThreadPool<Task,ShardedWorkCoordinatorRouted> thread_pool(queue_size, num_workers);
 		//thread_pool.launchWorkers();
 		
 		for (int task =0; task<num_tasks; task++)
@@ -198,7 +199,7 @@ void testGracefulShutdown (int queue_size, int num_workers, int numtasks)
 										};
 	
 	{
-		ThreadPool<Task,ShardedWorkCoordinator<Task>> thread_pool(queue_size, num_workers);
+		ThreadPool<Task,ShardedWorkCoordinatorRouted> thread_pool(queue_size, num_workers);
 		//thread_pool.launchWorkers();
 		
 		std::thread producer([&](){

@@ -58,10 +58,9 @@ static void BM_TaskSchedSharded(benchmark::State& state, Task workload)
 	for (auto _ : state)
 	{
 		// Construct threadpool
-		ThreadPool<Task,ShardedWorkCoordinator<Task>> thread_pool(queue_size,num_workers);
-		
-		// start workers 
-		//thread_pool.launchWorkers();
+		ThreadPool<Task,ShardedWorkCoordinator<Task,ChunkyRoundRobinRouting<4>>> thread_pool(queue_size,num_workers);
+		//ThreadPool<Task,ShardedWorkCoordinator<Task,ChunkyRoundRobinRouting<8>>> thread_pool(queue_size,num_workers);
+		//ThreadPool<Task,ShardedWorkCoordinator<Task,RoundRobinRouting>> thread_pool(queue_size,num_workers);
 		
 		auto consumer_start = std::chrono::steady_clock::now();
 		auto producer_start = std::chrono::steady_clock::now();
