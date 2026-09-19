@@ -19,6 +19,7 @@ BENCH_TARGET_PERF := run_bench-perf
 #BENCH_SRC := benchmarks/benchmark_threadpool.cpp
 #BENCH_SRC := benchmarks/bm_benchmark.cpp
 BENCH_SRC := benchmarks/sharded_tp_benchmark.cpp
+#BENCH_SRC := benchmarks/global_TP_benchmark.cpp
 
 PERFETTO_DIR := third_party/perfetto
 PERFETTO_SRC := $(PERFETTO_DIR)/perfetto.cc

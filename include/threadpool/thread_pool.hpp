@@ -18,6 +18,7 @@
 
 #include "./instrumentation/tracing.hpp"
 #include "coordinator/sharded_work_coordinator.hpp"
+#include "coordinator/global_work_coordinator.hpp"
 
 enum class PoolState{
 	CREATED,
@@ -204,14 +205,12 @@ void ThreadPool<Task,Coordinator>::stopPool()
 		pool_state_.store(PoolState::STOPPED,std::memory_order_release);
 		return;
 	}
-	
-	//pool_state_.wait(PoolState::INITIALIZE, std::memory_order_acquire);
 
 	enum PoolState expected = PoolState::RUNNING;
 	if(pool_state_.compare_exchange_strong(expected,PoolState::STOPPING, std::memory_order_seq_cst))
 	{
 		// handle all shutdown mechanics
-		coordinator_.wakeAllWorkers();
+		coordinator_.notifyDrain();
 			
 		// Join all worker threads
 		for (auto &worker : worker_threads_)
@@ -235,48 +234,32 @@ template<ExecutableTask Task, typename Coordinator>
 void ThreadPool<Task,Coordinator>::runWorker(std::size_t worker_id) noexcept
 {
 	// NOTE: currently valid for 1 task only, redesign later for mult-tasks
-    std::vector<Task> work_buff;
-    
-    // set a contract with Coordinator for task batch 
-    std::size_t max_batch = 6;
-    work_buff.reserve(max_batch);
-    std::size_t task_id = 0;
-    
-    coordinator_.setWorkerBatchSize(worker_id, max_batch);
-    
+    Task out_task;
+    unsigned int tasks_executed=0; 
+
     // keep polling for new tasks on this thread
-    while (true)
+    while (coordinator_.acquireWorkBlocking(worker_id, out_task ))
     {
-    	// blocks until coordinator returns work
-    	std::size_t task_count = coordinator_.acquireWorkBlocking(worker_id, work_buff );
-		
-		// count = 0 iff threadpool has requested shutdown and all queues work has drained
-		if (!task_count)
-			goto stop_worker;
-		
-		task_id = 0;
-		while(task_count--)
+		// Execute the task
+		try
 		{
-			// Execute the task
-        	try
-        	{
-        		TP_TRACE_EVENT("ExecuteTask");
-            	(work_buff[task_id++])();
-        	}
-        	catch (...)
-        	{
-            	std::cerr << "Task thown exception" << std::endl;
-        	}
-			
-			completed_tasks_.fetch_add(1,std::memory_order_relaxed);
+			TP_TRACE_EVENT("ExecuteTask");
+			out_task();
 		}
-		
-		//work_buff.clear();
-    }
-stop_worker:
-	//I want to retain this label as a single point in case any post exit cleanup needed later
-	return;
+		catch (...)
+		{
+			std::cerr << "Task thown exception" << std::endl;
+		}
+
+		tasks_executed++;
+		//completed_tasks_.fetch_add(1,std::memory_order_relaxed);
+
+    } 
+	completed_tasks_.fetch_add(tasks_executed,std::memory_order_relaxed);
 	
+	// If we're here, it means the queue is empty and shutdown requested
+	// so we can exit the worker thread
+	return;
 }
 
 #endif /* SIMPLE_THREADPOOL_H */

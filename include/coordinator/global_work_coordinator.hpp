@@ -1,6 +1,6 @@
 #pragma once
-#ifndef SHARDED_COORDINATOR_H
-#define SHARDED_COORDINATOR_H
+#ifndef GLOBAL_COORDINATOR_H
+#define GLOBAL_COORDINATOR_H
 
 #include <vector>
 #include <atomic>
@@ -12,21 +12,20 @@
 #include <semaphore>
 
 // TODO : include headers for QueueContainer and QueueTopology
-#include "../queue/SPSC_queue/spsc_lockfree.hpp"
+#include "../queue/SPMC_locked/spmc_queue.hpp"
 
 template <typename Task>
-struct SPSCShard
+struct GlobalSPMCQueue
 {
-	SPSCQueue<Task> queue_;							// queue storage
+	SPMCQueueLocked<Task> queue_;					// queue storage
 	std::counting_semaphore<INT_MAX> new_work_;		// work permits for consuming work 
 	//std::size_t batch_size_;
 	
-	explicit SPSCShard(std::size_t capacity):queue_(capacity),
-											 new_work_(0)//,
-											 //batch_size_(1)
+	explicit GlobalSPMCQueue(std::size_t capacity):	queue_(capacity),
+											       	new_work_(0)//,
+													//batch_size_(1)
 											
 	{
-	
 	}
 	
 		/*
@@ -37,20 +36,20 @@ struct SPSCShard
 };
 
 
-
-
 template <typename Task>
-class ShardedWorkCoordinator
+class GlobalWorkCoordinator
 {
 
 private:
 	std::size_t max_workers_;
 	
 	// Queue container
-	std::vector<std::unique_ptr<SPSCShard<Task>>> work_queues_;
+	//std::vector<std::unique_ptr<SPSCShard<Task>>> work_queues_;
+	//std::unique_ptr<GlobalSPMCQueue<Task>> global_queue_;
+	GlobalSPMCQueue<Task> global_spmc_;
 	
 	// routing state, non-atomic as we're expecting only single producer to increment it sequentially
-	std::size_t next_worker_;
+	//std::size_t next_worker_;
 	
 	// TODO: Define shared drain state - will it be per-shard or global ? 
 	
@@ -65,44 +64,19 @@ private:
 	// TODO: Work distribution policy
 	
 	// TODO: shutdown helpers
-	
-	
-	
-	void createQueueShards(std::size_t total_capacity)
-	{
-	
-		std::size_t perworker_capacity = total_capacity/max_workers_;
-		std::size_t leftover = total_capacity % max_workers_;
-	
-		work_queues_.reserve(max_workers_);	
-	
-		for (std::size_t shard = 0; shard < max_workers_; shard++)
-		{
-			std::size_t per_queue_capacity = perworker_capacity 
-										+ ((shard < leftover)?1:0);
-										
-			work_queues_.push_back(std::make_unique<SPSCShard<Task>>(per_queue_capacity));
-		}
-	}
-	
-	
-	void advanceShard()
-	{
-		next_worker_ = (next_worker_ + 1)% max_workers_;
-	}
 
 public:
 
 	// Disable copying
-    ShardedWorkCoordinator(const ShardedWorkCoordinator &) = delete;
-    ShardedWorkCoordinator &operator=(const ShardedWorkCoordinator &) = delete;
+    GlobalWorkCoordinator(const GlobalWorkCoordinator &) = delete;
+    GlobalWorkCoordinator &operator=(const GlobalWorkCoordinator &) = delete;
 
     // Disable moving
-    ShardedWorkCoordinator(ShardedWorkCoordinator &&) = delete;
-    ShardedWorkCoordinator &operator=(ShardedWorkCoordinator &&) = delete;
+    GlobalWorkCoordinator(GlobalWorkCoordinator &&) = delete;
+    GlobalWorkCoordinator &operator=(GlobalWorkCoordinator &&) = delete;
 	
 
-	ShardedWorkCoordinator(std::size_t task_capacity, std::size_t max_workers);
+	GlobalWorkCoordinator(std::size_t task_capacity, std::size_t max_workers);
 	
 	// Currently only single producer allowed to submit tasks
 	bool submit(Task &&task);
@@ -115,85 +89,66 @@ public:
 
 
 template <typename Task>
-ShardedWorkCoordinator<Task>::ShardedWorkCoordinator(std::size_t task_capacity, 
+GlobalWorkCoordinator<Task>::GlobalWorkCoordinator(std::size_t task_capacity, 
 													 std::size_t max_workers ) :
 														max_workers_(max_workers),
-														next_worker_(0)
+														global_spmc_(task_capacity)
 {
-		createQueueShards(task_capacity);
+		//createQueueShards(task_capacity);
 }
 
 
 template <typename Task>
-bool ShardedWorkCoordinator<Task>::acquireWorkBlocking(std::size_t worker_id,
+bool GlobalWorkCoordinator<Task>::acquireWorkBlocking(std::size_t worker_id,
 															  Task& out)
 {
 	// reason why Task default_initializable constraint required
 	Task task;
 	
 	// if shard has no work, block 
-	work_queues_[worker_id]->new_work_.acquire();
+	//work_queues_[worker_id]->new_work_.acquire();
+	global_spmc_.new_work_.acquire();
 
 	// tryPop WILL only fail when queue is empty after shutdown requested
 	// tryPop will not fail during normal operation, as counting semaphore always ensures queue has data before tryPop
-	return  work_queues_[worker_id]->queue_.tryPop(out);
+	return  global_spmc_.queue_.tryPop(out);
 }
 
 
 template <typename Task>
-bool ShardedWorkCoordinator<Task>::submit(Task& task)
+bool GlobalWorkCoordinator<Task>::submit(Task& task)
 {
-	bool ret = false;
-	
-	// choose shard
-	std::size_t shard = next_worker_;
-	 
-	 
-	// attempt admission to that shard
-	if ( (ret = work_queues_[shard]->queue_.tryPush(task)) )
+	// attempt admission to the global queue
+	if ( global_spmc_.queue_.tryPush(task) )
 	{
-		// if accepted, signal notify on that shard
-		work_queues_[shard]->new_work_.release();
+		// if accepted, signal notify to waiting workers
+		global_spmc_.new_work_.release();
+		return true;
 	}
-	
-	// Update routing state
-	advanceShard();
-	
-	// return accepted/ rejected
-	return ret;
+	return false;
 }
 
 template <typename Task>
-bool ShardedWorkCoordinator<Task>::submit(Task&& task)
+bool GlobalWorkCoordinator<Task>::submit(Task&& task)
 {
-	bool ret = false;
-	
-	// choose shard
-	std::size_t shard = next_worker_;
-	
-	// attempt admission to that shard
-	if ( (ret = work_queues_[shard]->queue_.tryPush(std::move(task))) )
+	// attempt admission to that global queue
+	if ( global_spmc_.queue_.tryPush(std::move(task)) )
 	{
-		// if accepted, signal notify on that shard
-		work_queues_[shard]->new_work_.release();
+		// if accepted, signal notify to waiting workers
+		global_spmc_.new_work_.release();
+		return true;
 	}
-	
-	// Update routing state
-	advanceShard();
-	
-	// return accepted/ rejected
-	return ret;
+	return false;
 }
 
 
 template <typename Task>
-void ShardedWorkCoordinator<Task>::notifyDrain()
+void GlobalWorkCoordinator<Task>::notifyDrain()
 {
-	for (std::size_t shard = 0; shard < max_workers_; shard++)
+	for (std::size_t worker = 0; worker < max_workers_; worker++)
 	{									
-			(work_queues_[shard]->new_work_).release();
+		global_spmc_.new_work_.release();
 	}
-
 }
 
 
@@ -228,6 +183,6 @@ public:
 
 */
 
-#endif /* SHARDED_COORDINATOR_H */
+#endif /* GLOBAL_COORDINATOR_H */
 
 
